@@ -13,7 +13,9 @@ Note:
 
 寫了一個 mix.bat 檔來解決你遇到的格式輸出錯誤問題。
 
-將mix.bat 檔放到 ffmpeg.exe 同一目錄下，然後在DOS command視窗中輸入:mix.bat "歌曲.mp4" "伴奏.mp3" "輸出的KTV歌曲.mkv"
+將mix.bat 檔放到 ffmpeg.exe 同一目錄下，然後在DOS command視窗中輸入:
+
+mix.bat "歌曲.mp4" "伴奏.mp3" "輸出的KTV歌曲.mkv"
 
 mix.bat 後的三個參數間請用空格分開喔. 每個參數用 " 符號括起來。
 
