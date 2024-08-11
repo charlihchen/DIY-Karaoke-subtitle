@@ -1,7 +1,7 @@
 # DIY-Karaoke-subtitle
 Making your own karaoke subtitle video for sing along at home use only. 
 
-ffmpeg command to make the karaoke sone No vocal on FL(Left channel) and vocal with instrumental on FR(Right channel).
+ffmpeg command to make the karaoke song with No Vocal on FL(Left channel) and Vocal with instrumental on FR(Right channel).
 
 In chinese, we call it "左伴右唱".
 
