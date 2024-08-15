@@ -27,6 +27,14 @@ mix.bat 後的三個參數間請用空格分開喔. 每個參數用 " 符號括�
 
 ![image](https://github.com/user-attachments/assets/28da4f02-a325-4880-9aa9-745737cc6f23)
 
+mix2k.exe執行檔有些陽春，因為我非程式設計師；
+
+它是微軟的copilot AI (類似ChatGPT)幫我生成的。
+
+至少它能達到我想要的結果。
+
+你們也可以試試 AI 的幫忙。
+
 Here is the "左伴右唱" diagram:
 
 ![image](https://github.com/user-attachments/assets/dcb1ff43-bbb7-4380-948a-20a41e6bd6bd)
