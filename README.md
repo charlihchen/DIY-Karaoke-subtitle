@@ -25,6 +25,8 @@ mix.bat 後的三個參數間請用空格分開喔. 每個參數用 " 符號括�
 
 (Make sure to put ffmpeg.exe and all its .dll files to the same folder of the mix2k.exe)
 
+Actually, there is ffmpeg.exe without .dll. You can download it at https://github.com/BtbN/FFmpeg-Builds/releases/
+
 ![image](https://github.com/user-attachments/assets/28da4f02-a325-4880-9aa9-745737cc6f23)
 
 mix2k.exe執行檔有些陽春，因為我非程式設計師；
