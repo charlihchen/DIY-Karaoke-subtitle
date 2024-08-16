@@ -23,21 +23,21 @@ class FFmpegMixerApp:
         #self.video_button.pack()  
 
         # Audio file input  
-        self.audio_label = tk.Label(root, text="Load Instrumental Audio(伴奏) File (MP3):")
-        self.video_label.grid(row=1, column=0)  # Adjust the row and column as needed           
+        self.audio_label = tk.Label(root, text="Load Instrumental Audio(伴奏) File (MP3/m4a):")
+        self.audio_label.grid(row=1, column=0)  # Adjust the row and column as needed           
         #self.audio_label.pack()  
         
         self.audio_entry = tk.Entry(root, width=50)
-        self.video_entry.grid(row=1, column=1)  # Adjust the row and column as needed         
+        self.audio_entry.grid(row=1, column=1)  # Adjust the row and column as needed         
         #self.audio_entry.pack()  
         
         self.audio_button = tk.Button(root, text="Browse(載入)", command=self.load_audio) 
-        self.video_button.grid(row=1, column=2)  # Adjust the row and column as needed          
+        self.audio_button.grid(row=1, column=2)  # Adjust the row and column as needed          
         #self.audio_button.pack()  
 
         # Mix button  
-        self.mix_button = tk.Button(root, text="Mix", command=self.mix_media)
-        self.video_button.grid(row=3, column=0)  # Adjust the row and column as needed
+        self.mix_button = tk.Button(root, text="Click here to Mix", command=self.mix_media)
+        self.mix_button.grid(row=3, column=0)  # Adjust the row and column as needed
         #self.mix_button.pack()  
 
     def load_video(self):  
