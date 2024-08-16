@@ -36,8 +36,9 @@ class FFmpegMixerApp:
         #self.audio_button.pack()  
 
         # Mix button  
-        self.mix_button = tk.Button(root, text="Mix", command=self.mix_media)  
-        self.mix_button.pack()  
+        self.mix_button = tk.Button(root, text="Mix", command=self.mix_media)
+        self.video_button.grid(row=3, column=0)  # Adjust the row and column as needed
+        #self.mix_button.pack()  
 
     def load_video(self):  
         video_filename = filedialog.askopenfilename(filetypes=[("Video Files(歌影檔案)", "*.mp4;*.mkv;*.avi")])  
