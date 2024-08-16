@@ -2,6 +2,7 @@ import os
 import subprocess  
 import tkinter as tk  
 from tkinter import filedialog, messagebox  
+#You can use the grid() method instead of pack()
 
 class FFmpegMixerApp:  
     def __init__(self, root):  
@@ -9,24 +10,30 @@ class FFmpegMixerApp:
         self.root.title("FFmpeg.exe Video and Audio Mixer to become Karaoke Song")  
 
         # Video file input  
-        self.video_label = tk.Label(root, text="Load Video(歌影) File:")  
-        self.video_label.pack()  
+        self.video_label = tk.Label(root, text="Load Video(歌影) File (MP4/MKV/MPG/AVI):")
+        self.video_label.grid(row=0, column=0)  # Adjust the row and column as needed        
+        #self.video_label.pack()  
         
-        self.video_entry = tk.Entry(root, width=50)  
-        self.video_entry.pack()  
+        self.video_entry = tk.Entry(root, width=50)
+        self.video_entry.grid(row=0, column=1)  # Adjust the row and column as needed        
+        #self.video_entry.pack()  
         
-        self.video_button = tk.Button(root, text="Browse", command=self.load_video)  
-        self.video_button.pack()  
+        self.video_button = tk.Button(root, text="Browse(載入)", command=self.load_video)
+        self.video_button.grid(row=0, column=2)  # Adjust the row and column as needed        
+        #self.video_button.pack()  
 
         # Audio file input  
-        self.audio_label = tk.Label(root, text="Load Instrumental Audio(伴奏) File (MP3):")  
-        self.audio_label.pack()  
+        self.audio_label = tk.Label(root, text="Load Instrumental Audio(伴奏) File (MP3):")
+        self.video_label.grid(row=1, column=0)  # Adjust the row and column as needed           
+        #self.audio_label.pack()  
         
-        self.audio_entry = tk.Entry(root, width=50)  
-        self.audio_entry.pack()  
+        self.audio_entry = tk.Entry(root, width=50)
+        self.video_entry.grid(row=1, column=1)  # Adjust the row and column as needed         
+        #self.audio_entry.pack()  
         
-        self.audio_button = tk.Button(root, text="Browse", command=self.load_audio)  
-        self.audio_button.pack()  
+        self.audio_button = tk.Button(root, text="Browse(載入)", command=self.load_audio) 
+        self.video_button.grid(row=1, column=2)  # Adjust the row and column as needed          
+        #self.audio_button.pack()  
 
         # Mix button  
         self.mix_button = tk.Button(root, text="Mix", command=self.mix_media)  
