@@ -6,12 +6,13 @@ ffmpeg command to make the karaoke song with No Vocal on FL(Left channel) and Vo
 In chinese, we call it "左伴右唱".
 
 Here is the sample command:
-
+<pre>
 ffmpeg.exe -i "Youtube下載歌曲(導唱字幕)_KTV.mp4" -i "Youtube下載歌曲(伴奏)_instrumental.mp3" -map 0:v -filter_complex "[1:a][0:a]amerge=inputs=2,pan=stereo|c0<c0+c1|c1<c2+c3[a]" -map "[a]" "KTV_song歌曲(左伴右唱).mkv"
-
+</pre>
 聽說正版的K歌都是右伴左唱，所以 the sample command:
-
+<pre>
 ffmpeg.exe -i "Youtube下載歌曲(導唱字幕)_KTV.mp4" -i "Youtube下載歌曲(伴奏)_instrumental.mp3" -map 0:v -filter_complex "[0:a][1:a]amerge=inputs=2,pan=stereo|c0<c0+c1|c1<c2+c3[a]" -map "[a]" "KTV_song歌曲(右伴左唱).mkv"
+</c0>pre>
 
 Note:
 
