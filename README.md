@@ -9,6 +9,10 @@ Here is the sample command:
 
 ffmpeg.exe -i "Youtube下載歌曲(導唱字幕)_KTV.mp4" -i "Youtube下載歌曲(伴奏)_instrumental.mp3" -map 0:v -filter_complex "[1:a][0:a]amerge=inputs=2,pan=stereo|c0<c0+c1|c1<c2+c3[a]" -map "[a]" "KTV_song歌曲(左伴右唱).mkv"
 
+聽說正版的都是右伴左唱，所以 the sample command:
+
+ffmpeg.exe -i "Youtube下載歌曲(導唱字幕)_KTV.mp4" -i "Youtube下載歌曲(伴奏)_instrumental.mp3" -map 0:v -filter_complex "[0:a][1:a]amerge=inputs=2,pan=stereo|c0<c0+c1|c1<c2+c3[a]" -map "[a]" "KTV_song歌曲(右伴左唱).mkv"
+
 Note:
 
 寫了一個 mix.bat 檔來解決你遇到的格式輸出錯誤問題。
