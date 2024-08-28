@@ -49,3 +49,7 @@ mix2k.exe執行檔有些陽春，因為我非程式設計師；
 Here is the "左伴右唱" diagram:
 
 ![image](https://github.com/user-attachments/assets/dcb1ff43-bbb7-4380-948a-20a41e6bd6bd)
+
+The concept of the mix2k.exe in diagram:
+
+![image](https://github.com/user-attachments/assets/5b6ea515-f388-4c03-af47-30843090e25e)
