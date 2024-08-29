@@ -50,6 +50,8 @@ mix2k.exe執行檔有些陽春，因為我非程式設計師；
 
 The sepreating vocal and no-vocal by Demucs and mixing by ffmpeg,exe take time depend on your PC spec.
 
+<hr class="dotted">
+
 Here is the "左伴右唱" diagram:
 
 ![image](https://github.com/user-attachments/assets/dcb1ff43-bbb7-4380-948a-20a41e6bd6bd)
