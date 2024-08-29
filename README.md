@@ -45,7 +45,7 @@ mix2k.exe執行檔有些陽春，因為我非程式設計師；
 你們也可以試試 AI 的幫忙。
 <hr class="dashed">
 12k.exe is created. Make sure the file run with ffmpeg.exe in the same folder. :)<br>
-(12k.exe 已創建。確保 EXE 檔 跟 ffmpeg.exe 在同一資料夾中一起運行。)
+(12k.exe 已創建。確保 EXE 檔 跟 ffmpeg.exe 在同一資料夾中一起運行。)<br>
 
 Just test it myself on other PC without python installed and the 12k.exe is unable to call Demucs<br>
 So, have to find a way to pack the Demucs into 12k.exe. Stay tune with newest 12k.exe then.<br>
