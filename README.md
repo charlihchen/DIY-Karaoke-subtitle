@@ -48,7 +48,7 @@ mix2k.exe執行檔有些陽春，因為我非程式設計師；
 <hr class="dashed">
 12k.exe is created. Make sure the file run with ffmpeg.exe in the same folder. :)
 
-The sepreating vocal and no-vocal by Demucs and mixing by ffmpeg,exe take time depend on your PC spec.
+The separating vocal and no-vocal by Demucs and mixing by ffmpeg,exe take time depend on your PC spec.
 
 <hr class="dotted">
 
