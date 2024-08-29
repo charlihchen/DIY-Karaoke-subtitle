@@ -36,8 +36,6 @@ Actually, there is ffmpeg.exe without .dll. You can download it at https://githu
 The ffmpeg.exe without .dll from the folder .\portable_version\bin\
 You can download ffmpeg.exe portable version at https://www.gyan.dev/ffmpeg/builds/ffmpeg-git-full.7z
 
-![image](https://github.com/user-attachments/assets/b330353e-d654-4cbb-b8bc-3678364ab7b6)
-
 mix2k.exe執行檔有些陽春，因為我非程式設計師；
 
 它是微軟的copilot AI (類似ChatGPT)幫我生成的。
@@ -52,7 +50,7 @@ mix2k.exe執行檔有些陽春，因為我非程式設計師；
 The separating vocal and no-vocal by Demucs and mixing by ffmpeg,exe take time depend on your PC spec.<br>
 (Demucs 的分離 vocal 和 no-vocal 以及 ffmpegexe 的混音處理需要一些時間，具體取決於您的 PC 規格。)<br>
 Will try to create the same function App to run on MacOS M1/M2/M3. Guess that it will process faster with GPU then.<br>
-![image](https://github.com/user-attachments/assets/5cd0fe66-b3ae-4e9a-8452-ea483bc16055)
+![image](https://github.com/user-attachments/assets/b330353e-d654-4cbb-b8bc-3678364ab7b6)
 <hr class="dotted">
 
 Here is the "左伴右唱" diagram:
