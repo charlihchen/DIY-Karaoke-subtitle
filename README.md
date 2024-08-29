@@ -51,7 +51,7 @@ mix2k.exe執行檔有些陽春，因為我非程式設計師；
 
 The separating vocal and no-vocal by Demucs and mixing by ffmpeg,exe take time depend on your PC spec.<br>
 (Demucs 的分離 vocal 和 no-vocal 以及 ffmpegexe 的混音處理需要一些時間，具體取決於您的 PC 規格。)<br>
-Will try to create the same function App to run on MacOS M1/M2/M3. Guess that it will process fater with GPU then.<br>
+Will try to create the same function App to run on MacOS M1/M2/M3. Guess that it will process faster with GPU then.<br>
 <hr class="dotted">
 
 Here is the "左伴右唱" diagram:
