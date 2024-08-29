@@ -24,8 +24,7 @@ Note:
 mix.bat "歌曲.mp4" "伴奏.mp3" "輸出的KTV歌曲.mkv"
 
 mix.bat 後的三個參數間請用空格分開喔. 每個參數用 " 符號括起來。
-
-
+<hr class="dashed">
 又寫了一個 mix2k.exe 檔來解決只習慣用GUI的人。
 
 記得要將ffmpeg.exe檔跟它的所有 ?????.dll檔都放跟mix2k.exe在同一檔案夾中。
@@ -46,8 +45,7 @@ mix2k.exe執行檔有些陽春，因為我非程式設計師；
 至少它能達到我想要的結果。
 
 你們也可以試試 AI 的幫忙。
-
-
+<hr class="dashed">
 12k.exe is created. Make sure the file run with ffmpeg.exe in the same folder. :)
 
 The sepreating vocal and no-vocal by Demucs and mixing by ffmpeg,exe take time depend on your PC spec.
