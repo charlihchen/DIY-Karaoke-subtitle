@@ -49,7 +49,7 @@ mix2k.exe執行檔有些陽春，因為我非程式設計師；
 <pre>
 Just test it myself on other PC without python installed and the 12k.exe is unable to call Demucs.
 So, have to find a way to pack the Demucs into 12k.exe. Stay tune with newest 12k.exe then.
-Gaveup the ideal of pack the Demucs into 12k.exe since it add-up file size from 9,713KB=9MB to 329,503KB = 329MB.
+Gaveup the ideal of pack the Demucs into 12k.exe since it add-up file size from 9,713KB=9MB to 329,503KB=329MB.
 The loading time for the 329MB 12k.exe is around 2 to 3 minutes. It is unacceptable!!!
 </pre>
 
