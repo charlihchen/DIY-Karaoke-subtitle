@@ -43,7 +43,7 @@ class FFmpegMixerApp:
                 elif os.path.isdir(path):
                     shutil.rmtree(path)
             except Exception as e:
-                print(f"警告：無法刪除 {path}：{str(e)}")
+                print(f"Warning: Unable to delete(警告：無法刪除) {path}：{str(e)}")
         
         # Derive output file name from video file name
         base_name = os.path.splitext(os.path.basename(video_file))[0]
@@ -108,7 +108,7 @@ class FFmpegMixerApp:
         wav_file = f"{base_name}.wav"
         if os.path.exists(wav_file):
             os.remove(wav_file)
-            print(f"File '{wav_file}' deleted successfully.")
+            print(f"Temporary File '{wav_file}' and Folder '{demucs_output_dir}' deleted successfully.")
         else:
             print("The file does not exist")
 			
