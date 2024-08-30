@@ -52,7 +52,13 @@ So, have to find a way to pack the Demucs into 12k.exe. Stay tune with newest 12
 Gaveup the ideal of pack the Demucs into 12k.exe since it add-up file size from 9,713KB=9MB to 329,503KB=329MB.
 The loading time for the 329MB 12k.exe is around 2 to 3 minutes. It is unacceptable!!!
 </pre>
-
+<pre>
+  放棄將 Demucs lib 打包進 12k.exe 的理想來給這些不想安裝 Python 的使用者。
+  因為打完包的 12k.exe 檔案大小增大到 329MB， 而且每次執行它要等 3 分鐘的 Demucs loading time(裝載時間)。
+  所以還是請使用者乖乖的來安裝 Python 到你的電腦上吧。
+  已經盡力將 12k.py 轉成 12k.exe 讓使用者省去打 python 12k.py 來執行 12k.py程式的動作。
+  但使用者還是得學習 DOS command prompt 或 Anaconda Prompt 的操作環境。
+</pre>
 The separating vocal and no-vocal by Demucs and mixing by ffmpeg,exe take time depend on your PC spec.<br>
 (Demucs 的分離 vocal 和 no-vocal 以及 ffmpegexe 的混音處理需要一些時間，具體取決於您的 PC 規格。)<br>
 Will try to create the same function App to run on MacOS M1/M2/M3. Guess that it will process faster with GPU then.<br>
