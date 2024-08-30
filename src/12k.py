@@ -1,5 +1,6 @@
 import os
 import subprocess
+import shutil
 import tkinter as tk
 from tkinter import filedialog, messagebox
 
@@ -35,6 +36,15 @@ class FFmpegMixerApp:
             messagebox.showerror("Error", "Please provide a video file.")
             return
 
+        def safe_remove(path):
+            try:
+                if os.path.isfile(path):
+                    os.remove(path)
+                elif os.path.isdir(path):
+                    shutil.rmtree(path)
+            except Exception as e:
+                print(f"警告：無法刪除 {path}：{str(e)}")
+        
         # Derive output file name from video file name
         base_name = os.path.splitext(os.path.basename(video_file))[0]
         output_file = f"{base_name}(DIY KTV).mkv"
@@ -42,14 +52,13 @@ class FFmpegMixerApp:
         # Convert video_file into .wav for Demucs
         command = [
             'ffmpeg',
-			'-y', #overwrite output file if exists
+            '-y', #overwrite output file if exists
             '-i', video_file,
             f"{base_name}.wav"
         ]
 
         try:
             subprocess.run(command, check=True)
-            #messagebox.showinfo("Success", "Media mixed successfully!")
         except subprocess.CalledProcessError as e:
             messagebox.showerror("Error", f"An error occurred: {str(e)}")
             return
@@ -64,7 +73,6 @@ class FFmpegMixerApp:
 
         try:
             subprocess.run(["demucs", "--two-stems=vocals", "-o", demucs_output_dir, "--mp3", f"{base_name}.wav"], check=True)
-			#subprocess.run(["demucs", "-o", demucs_output_dir, "--device=cuda", "--mp3", f"{base_name}.wav"], check=True)
         except FileNotFoundError:
             messagebox.showerror("Error", "Demucs executable not found. Please ensure it is installed and in your PATH.")
             return
@@ -73,9 +81,8 @@ class FFmpegMixerApp:
             return
 
         # Find the extracted instrumental audio file
-        # 12k\demucs_output\htdemucs\VideoFileName\no_vocals.mp3
         instrumental_audio_file = os.path.join(demucs_output_dir, "htdemucs", base_name, "no_vocals.mp3")
-		
+        
         if not os.path.exists(instrumental_audio_file):
             messagebox.showerror("Error", "Instrumental audio file not found.")
             return
@@ -96,6 +103,15 @@ class FFmpegMixerApp:
         except subprocess.CalledProcessError as e:
             messagebox.showerror("Error", f"An error occurred: {str(e)}")
 
+        # Clean up temporary files
+        safe_remove(demucs_output_dir)
+        wav_file = f"{base_name}.wav"
+        if os.path.exists(wav_file):
+            os.remove(wav_file)
+            print(f"File '{wav_file}' deleted successfully.")
+        else:
+            print("The file does not exist")
+			
 if __name__ == "__main__":
     root = tk.Tk()
     app = FFmpegMixerApp(root)
