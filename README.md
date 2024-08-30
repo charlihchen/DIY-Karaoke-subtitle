@@ -58,6 +58,12 @@ The loading time for the 329MB 12k.exe is around 2 to 3 minutes. It is unaccepta
   所以還是請使用者乖乖的來安裝 Python 到你的電腦上吧。
   已經盡力將 12k.py 轉成 12k.exe 讓使用者省去打 python 12k.py 來執行 12k.py程式的動作。
   但使用者還是得學習 DOS command prompt 或 Anaconda Prompt 的操作環境。
+
+缺什麼就用 pip install 來裝什麼。
+===============================
+例如, 執行完 python 12k.py
+上面錯誤(Error)說缺 Demucs
+那就用pip install demucs 來裝 demucs
 </pre>
 The separating vocal and no-vocal by Demucs and mixing by ffmpeg,exe take time depend on your PC spec.<br>
 (Demucs 的分離 vocal 和 no-vocal 以及 ffmpegexe 的混音處理需要一些時間，具體取決於您的 PC 規格。)<br>
