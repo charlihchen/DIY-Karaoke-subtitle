@@ -7,7 +7,7 @@ from tkinter import filedialog, messagebox
 class FFmpegMixerApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("Load Video and use Demucs to extract NoVocal.mp3 and use FFmpeg.exe to mix the Video and the MP3 into Karaoke Song")
+        self.root.title("Load Video & extract NoVocal.mp3 by Demucs, mix it and Video to Karaoke Song by FFmpeg")
 
         # Video file input
         self.video_label = tk.Label(root, text="Load Video (歌影) File (MP4/MKV/MPG/AVI):")
@@ -118,6 +118,7 @@ if __name__ == "__main__":
     root.mainloop()
 
 #Created by Charlih Chen on 28AUG2024
+#https://github.com/charlihchen
 #Here are some potential solutions:
 #Check Demucs Installation:
 #Ensure that Demucs is correctly installed on your system. If you haven’t installed it yet, follow the instructions from the Demucs GitHub repository.
