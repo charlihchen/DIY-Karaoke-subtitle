@@ -7,7 +7,7 @@ from tkinter import filedialog, messagebox
 class FFmpegMixerApp:  
     def __init__(self, root):  
         self.root = root  
-        self.root.title("FFmpeg.exe Video and Audio Mixer to become Karaoke Song")  
+        self.root.title("Load Video and Audio to mix into Karaoke Song by FFmpeg.exe")  
 
         # Video file input  
         self.video_label = tk.Label(root, text="Load Video(歌影) File (MP4/MKV/MPG/AVI):")
@@ -85,5 +85,7 @@ if __name__ == "__main__":
     app = FFmpegMixerApp(root)  
     root.mainloop()
 #Note:
-#Copy ffmpeg.exe and all its .dll in the same folder of the mix2k.exe
-#Of couse, the Video file and audio file that will mix into as Karaoke song file may need to be the same folder
+# Copy ffmpeg.exe and all its .dll in the same folder of the mix2k.exe
+# Of couse, the Video file and audio file that will mix into as Karaoke song file may need to be the same folder
+# Created by Charlih Chen on 28AUG2024
+# https://github.com/charlihchen
