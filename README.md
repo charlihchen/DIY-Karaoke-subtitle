@@ -79,3 +79,5 @@ Here is the "左伴右唱" diagram:
 The concept of the mix2k.exe in diagram:
 
 ![image](https://github.com/user-attachments/assets/5b6ea515-f388-4c03-af47-30843090e25e)
+
+<a href="https://www.buymeacoffee.com/charlih"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=☕&slug=charlih&button_colour=FFDD00&font_colour=000000&font_family=Arial&outline_colour=000000&coffee_colour=ffffff" /></a>
