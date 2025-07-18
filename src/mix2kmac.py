@@ -1,5 +1,7 @@
 # Usage: $python mnix2kmac.py
 #
+# $dist/Mix2kmac.app/Contents/MacOS/Mix2kmac
+#
 import os
 import subprocess
 import tkinter as tk
