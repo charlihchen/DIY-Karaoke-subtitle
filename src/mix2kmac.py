@@ -1,3 +1,5 @@
+# Usage: $python mnix2kmac.py
+#
 import os
 import subprocess
 import tkinter as tk
