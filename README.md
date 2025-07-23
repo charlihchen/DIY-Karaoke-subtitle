@@ -44,7 +44,7 @@ mix2k.exe執行檔有些陽春，因為我非程式設計師；
 
 你們也可以試試 AI 的幫忙。
 
-The mix2kmac mixed output path is under /Users/yourMacAccountNane/
+The mix2kmac mixed output path is under /Users/yourMacAccountName/
 
 Or using Finder >> Go >> Go to Folder... >> input "/Users" >> Enter >> YourMacAccountName
 
