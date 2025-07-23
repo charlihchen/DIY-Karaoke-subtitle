@@ -107,4 +107,5 @@ The concept of the mix2k.exe in diagram:
 
 ![image](https://github.com/user-attachments/assets/5b6ea515-f388-4c03-af47-30843090e25e)
 
-<a href="https://www.buymeacoffee.com/charlih"><img src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="charlih" data-color="#FFDD00" data-emoji="☕"  data-font="Cookie" data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff)" ></a>
+<a href="https://www.buymeacoffee.com/charlih" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
+
