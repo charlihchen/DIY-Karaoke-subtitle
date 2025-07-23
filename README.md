@@ -44,6 +44,22 @@ mix2k.exe執行檔有些陽春，因為我非程式設計師；
 
 你們也可以試試 AI 的幫忙。
 
+Note:
+
+Just foud out 2 issues for those distributing .exe(for Windows OS) and .app(for Mac OS) files.
+
+#1 issue: Windows OS will detect with malware for those mix2k.exe and mix2k_dragdrop.exe.
+
+#2 issue: Mac OS won't able to run the distributed App once you donwloadeded it to your Mac.
+
+Best Solution for us issues is to run python on Terminal for those 3 py codes:
+
+#1. Press "Windows" key and "X" key >> Select "Terminal" >> input python mix2k.py or python mix2k_dragdrop.py
+
+#2. Press "Cmd" and "Space" >> input "terminal" on spotlight search box >> Press Enter >> inpot python mix2kmac.py
+
+Note2:
+
 The mix2kmac mixed output path is under /Users/yourMacAccountName/
 
 Or using Finder >> Go >> Go to Folder... >> input "/Users" >> Enter >> YourMacAccountName
