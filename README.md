@@ -52,7 +52,7 @@ Just foud out 2 issues for those distributing .exe(for Windows OS) and .app(for 
 
 #2 issue: Mac OS won't able to run the distributed App once you donwloadeded it to your Mac.
 
-Best Solution for us issues is to run python on Terminal for those 3 py codes:
+Best Solution for the above issues is to run python on Terminal for those 3 py codes:
 
 #1. Press "Windows" key and "X" key >> Select "Terminal" >> input python mix2k.py or python mix2k_dragdrop.py
 
