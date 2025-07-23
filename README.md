@@ -43,6 +43,10 @@ mix2k.exe執行檔有些陽春，因為我非程式設計師；
 至少它能達到我想要的結果。
 
 你們也可以試試 AI 的幫忙。
+
+The mix2kmac mixed output path is under /Users/yourMacAccountNane/
+Or using Finder >> Go >> Go to Folder... >> input "/Users" >> Enter >> YourMacAccountName
+
 <hr class="dashed">
 12k.exe is created. Make sure the file run with ffmpeg.exe in the same folder. :)<br>
 (12k.exe 已創建。確保 EXE 檔 跟 ffmpeg.exe 在同一資料夾中一起運行。)<br>
