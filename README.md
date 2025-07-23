@@ -60,6 +60,12 @@ Best Solution for the above issues is to run python on Terminal for those 3 py c
 
 Note2:
 
+$pip install pyinstaller
+
+$pyinstaller --onefile mix2kmac.py
+
+The mix2kmac App is under the "dist" folder.
+
 The mix2kmac mixed output path is under /Users/yourMacAccountName/
 
 Or using Finder >> Go >> Go to Folder... >> input "/Users" >> Enter >> YourMacAccountName
