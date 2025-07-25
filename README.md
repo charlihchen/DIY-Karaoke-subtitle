@@ -70,6 +70,8 @@ The mix2kmac mixed output path is under /Users/yourMacAccountName/
 
 Or using Finder >> Go >> Go to Folder... >> input "/Users" >> Enter >> YourMacAccountName
 
+$pip install tkinterdnd2 for mix2kmac_dragdrop.py
+
 <hr class="dashed">
 12k.exe is created. Make sure the file run with ffmpeg.exe in the same folder. :)<br>
 (12k.exe 已創建。確保 EXE 檔 跟 ffmpeg.exe 在同一資料夾中一起運行。)<br>
