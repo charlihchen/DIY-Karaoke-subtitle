@@ -118,7 +118,7 @@ class FFmpegMixerApp:
             return
 
         base_name = os.path.splitext(os.path.basename(video_file))[0]
-        output_file = f"{base_name}(DIY KTV).mkv"
+        output_file = f"{base_name} (DIY KTV).mkv"
 
         ffmpeg_executable = 'ffmpeg'
         script_dir = os.path.dirname(os.path.abspath(__file__))
