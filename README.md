@@ -25,8 +25,8 @@ mix.bat "歌曲.mp4" "伴奏.mp3" "輸出的KTV歌曲.mkv"
 
 mix.bat 後的三個參數間請用空格分開喔. 每個參數用 " 符號括起來。
 <hr class="dashed">
-I recently discovered the "FFmpeg Batch AV converter" free GUI application for FFmpeg at https://github.com/eibols/ffmpeg_batch<br>
-
+I recently discovered the "FFmpeg Batch AV converter" free GUI application for FFmpeg at https://github.com/eibols/ffmpeg_batch
+<hr class="dashed">
 又寫了一個 mix2k.exe 檔來解決只習慣用GUI的人。
 
 記得要將ffmpeg.exe檔跟它的所有 ?????.dll檔都放跟mix2k.exe在同一檔案夾中。
