@@ -114,3 +114,53 @@ The concept of the mix2k.exe in diagram:
 
 <a href="https://www.buymeacoffee.com/charlih" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
 
+<hr class="dashed">
+
+## The apps (built automatically)
+
+The Python sources in `src/` are built into real apps by GitHub
+Actions on every change — Windows `.exe` files and macOS `.app`
+bundles, all in the `app/` folder (see `app/README.md` for how to
+run them and the first-run warnings).
+
+| App | Platform | What it does |
+| --- | --- | --- |
+| `mix2k.exe` | Windows | Video + instrumental → karaoke file |
+| `mix2k_dragdrop.exe` | Windows | Same, with drag-and-drop |
+| `12k.exe` | Windows | Video only — Demucs separates the instrumental, then mixes |
+| `mix2kmac.app` | macOS | Video + instrumental → karaoke file |
+| `mix2kmac_dragdrop.app` | macOS | Same, with drag-and-drop / paste |
+| `12kmac.app` | macOS | Video only — Demucs separation + mix |
+
+What changed in the reprogram (Oct 2026):
+
+- ffmpeg is bundled inside every app (via imageio-ffmpeg), so you
+  no longer need ffmpeg.exe next to the app.
+- The output `.mkv` is saved next to the video you picked, not in
+  whatever folder the app happened to start in.
+- The window no longer freezes while a mix runs — there is a
+  status line and a progress bar, and the Mix button is disabled
+  until it finishes.
+- Failures show ffmpeg's own error message instead of a bare
+  "returned non-zero exit status".
+- `12k` / `12kmac` no longer have a hardcoded
+  `C:\Users\charl\...` Demucs path; they find Demucs on PATH and
+  explain how to install it when it is missing. Temp files are
+  always cleaned up, even when a step fails.
+- `mix2k_dragdrop2.py` was an exact duplicate of
+  `mix2k_dragdrop.py` and was removed.
+
+Two honest limits (unchanged):
+
+1. The apps are not code-signed, so Windows SmartScreen and macOS
+   Gatekeeper still warn on first run. Signing needs paid
+   certificates (Windows) / a paid Apple Developer account
+   ($99/year). Workarounds are in `app/README.md`.
+2. `12k` / `12kmac` still need Demucs installed separately
+   (`pip install demucs`) — bundling it makes a ~330 MB app that
+   takes 2–3 minutes to start.
+
+The old `src/setup.py` / `src/setup2.py` (py2app) are superseded
+by the PyInstaller + GitHub Actions build; they are kept for
+reference only.
+

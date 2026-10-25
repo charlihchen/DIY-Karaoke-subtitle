@@ -1,128 +1,103 @@
+"""12k -- one-file karaoke maker (Windows GUI).
+
+Pick a video (歌影) and the app does the rest:
+1. extracts the audio with ffmpeg,
+2. separates the instrumental with Demucs (no_vocals),
+3. mixes video + instrumental + original audio into a stereo
+   karaoke file -- "左伴右唱".
+
+Demucs is NOT bundled into the app (bundling it makes a ~330 MB
+exe that takes 2-3 minutes to start -- see README). You still
+need Python with ``pip install demucs``. The app checks for
+demucs and tells you exactly how to install it when it is
+missing. ffmpeg ships inside the app.
+
+Built with PyInstaller into 12k.exe (see .github/workflows/
+build-apps.yml).
+"""
+
 import os
-import subprocess
-import shutil
 import tkinter as tk
-from tkinter import filedialog, messagebox
+from tkinter import filedialog, messagebox, ttk
+
+import karaoke_common as kc
+
 
 class FFmpegMixerApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Load Video & extract NoVocal.mp3 by Demucs, mix it and Video to Karaoke Song by FFmpeg")
 
-        # Video file input
         self.video_label = tk.Label(root, text="Load Video (歌影) File (MP4/MKV/MPG/AVI):")
-        self.video_label.grid(row=0, column=0)
+        self.video_label.grid(row=0, column=0, padx=5, pady=5, sticky="w")
 
         self.video_entry = tk.Entry(root, width=50)
-        self.video_entry.grid(row=0, column=1)
+        self.video_entry.grid(row=0, column=1, padx=5, pady=5)
 
         self.video_button = tk.Button(root, text="Browse (載入)", command=self.load_video)
-        self.video_button.grid(row=0, column=2)
+        self.video_button.grid(row=0, column=2, padx=5, pady=5)
 
-        # Mix button
         self.mix_button = tk.Button(root, text="Click here to Mix", command=self.mix_media)
-        self.mix_button.grid(row=3, column=0)
+        self.mix_button.grid(row=3, column=0, columnspan=3, pady=10)
+
+        self.status_label = tk.Label(root, text="", fg="blue")
+        self.status_label.grid(row=4, column=0, columnspan=3, padx=5, pady=2, sticky="w")
+
+        self.progress = ttk.Progressbar(root, mode="indeterminate")
+        self.progress.grid(row=5, column=0, columnspan=3, padx=5, pady=2, sticky="ew")
+
+        self.job = kc.BackgroundJob(root, self.status_label, [self.mix_button])
 
     def load_video(self):
-        video_filename = filedialog.askopenfilename(filetypes=[("Video Files (歌影檔案)", "*.mp4;*.mkv;*.avi")])
+        video_filename = filedialog.askopenfilename(filetypes=kc.VIDEO_TYPES)
         if video_filename:
             self.video_entry.delete(0, tk.END)
             self.video_entry.insert(0, video_filename)
 
     def mix_media(self):
-        video_file = self.video_entry.get()
+        video_file = self.video_entry.get().strip()
 
         if not video_file:
             messagebox.showerror("Error", "Please provide a video file.")
             return
-
-        def safe_remove(path):
-            try:
-                if os.path.isfile(path):
-                    os.remove(path)
-                elif os.path.isdir(path):
-                    shutil.rmtree(path)
-            except Exception as e:
-                print(f"Warning: Unable to delete(警告：無法刪除) {path}：{str(e)}")
-        
-        # Derive output file name from video file name
-        base_name = os.path.splitext(os.path.basename(video_file))[0]
-        output_file = f"{base_name}(DIY KTV).mkv"
-
-        # Convert video_file into .wav for Demucs
-        command = [
-            'ffmpeg',
-            '-y', #overwrite output file if exists
-            '-i', video_file,
-            f"{base_name}.wav"
-        ]
-
-        try:
-            subprocess.run(command, check=True)
-        except subprocess.CalledProcessError as e:
-            messagebox.showerror("Error", f"An error occurred: {str(e)}")
+        if not os.path.isfile(video_file):
+            messagebox.showerror("Error", f"Video file not found:\n{video_file}")
             return
 
-        # Ensure the path to Demucs is in the PATH environment variable
-        demucs_path = r"C:\Users\charl\anaconda3\Scripts"
-        os.environ["PATH"] += os.pathsep + demucs_path
-
-        # Use Demucs to extract instrumental audio
-        demucs_output_dir = os.path.join(os.path.dirname(f"{base_name}.wav"), "demucs_output")
-        os.makedirs(demucs_output_dir, exist_ok=True)
-
-        try:
-            subprocess.run(["demucs", "--two-stems=vocals", "-o", demucs_output_dir, "--mp3", f"{base_name}.wav"], check=True)
-        except FileNotFoundError:
-            messagebox.showerror("Error", "Demucs executable not found. Please ensure it is installed and in your PATH.")
-            return
-        except subprocess.CalledProcessError as e:
-            messagebox.showerror("Error", f"Demucs failed: {str(e)}")
+        ffmpeg = kc.find_ffmpeg()
+        if not ffmpeg:
+            messagebox.showerror("FFmpeg not found", kc.ffmpeg_missing_message())
             return
 
-        # Find the extracted instrumental audio file
-        instrumental_audio_file = os.path.join(demucs_output_dir, "htdemucs", base_name, "no_vocals.mp3")
-        
-        if not os.path.exists(instrumental_audio_file):
-            messagebox.showerror("Error", "Instrumental audio file not found.")
+        demucs = kc.find_demucs()
+        if not demucs:
+            messagebox.showerror("Demucs not found", kc.demucs_missing_message())
             return
 
-        command = [
-            'ffmpeg',
-            '-i', video_file,
-            '-i', instrumental_audio_file,
-            '-map', '0:v',
-            '-filter_complex', '[1:a][0:a]amerge=inputs=2,pan=stereo|c0<c0+c1|c1<c2+c3[a]',
-            '-map', '[a]',
-            output_file
-        ]
+        output_file = kc.karaoke_output_path(video_file, spaced=False)
 
-        try:
-            subprocess.run(command, check=True)
-            messagebox.showinfo("Success", "Media mixed successfully!")
-        except subprocess.CalledProcessError as e:
-            messagebox.showerror("Error", f"An error occurred: {str(e)}")
+        def work():
+            return kc.separate_vocals_and_mix(ffmpeg, demucs, video_file, output_file)
 
-        # Clean up temporary files
-        safe_remove(demucs_output_dir)
-        wav_file = f"{base_name}.wav"
-        if os.path.exists(wav_file):
-            os.remove(wav_file)
-            print(f"Temporary File '{wav_file}' and Folder '{demucs_output_dir}' deleted successfully.")
-        else:
-            print("The file does not exist")
-			
+        def done(ok, message):
+            self.progress.stop()
+            if ok:
+                messagebox.showinfo("Success", f"Media mixed successfully!\nOutput: {output_file}")
+            else:
+                messagebox.showerror("Error", f"Mixing failed.\n{message}")
+
+        self.progress.start(20)
+        self.job.start(
+            "Working... extracting audio, separating vocals with Demucs, then mixing. "
+            "This takes a few minutes -- please wait.",
+            work, done,
+        )
+
+
 if __name__ == "__main__":
     root = tk.Tk()
     app = FFmpegMixerApp(root)
     root.mainloop()
 
-#Created by Charlih Chen on 28AUG2024
-#https://github.com/charlihchen
-#Here are some potential solutions:
-#Check Demucs Installation:
-#Ensure that Demucs is correctly installed on your system. If you haven’t installed it yet, follow the instructions from the Demucs GitHub repository.
-#Specify the Full Path to Demucs:
-#Instead of just using "demucs" as the command, provide the full path to the Demucs executable.
-#demucs_path = r"C:\path\to\demucs.exe"
-#subprocess.run([demucs_path, "-o", demucs_output_dir, "--device=cuda", video_file], check=True)
+# Created by Charlih Chen on 28AUG2024
+# https://github.com/charlihchen

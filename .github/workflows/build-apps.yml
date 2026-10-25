@@ -1,0 +1,120 @@
+# Build the karaoke apps for Windows and macOS.
+#
+# Runs on every push that touches src/ (or this file), and on demand
+# from the Actions tab. Each push produces fresh apps and commits
+# them into app/ (app/windows/*.exe, app/mac/*.app.zip).
+#
+# Why GitHub Actions: a Windows .exe can only be built on Windows
+# and a macOS .app only on a Mac. These runners are real Windows
+# and Apple Silicon Mac machines, so the builds are the real thing.
+#
+# The apps are NOT code-signed (that needs paid certificates), so
+# Windows SmartScreen and macOS Gatekeeper will still warn on first
+# run -- see app/README.md for the workarounds.
+#
+# The publish job only touches app/, and this workflow only triggers
+# on src/ + this file, so its own commits can never re-trigger it.
+
+name: Build karaoke apps
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "src/**"
+      - ".github/workflows/build-apps.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install build tools
+        run: pip install pyinstaller imageio-ffmpeg tkinterdnd2
+      - name: Build mix2k.exe
+        working-directory: src
+        run: pyinstaller --onefile --windowed --name mix2k --collect-all imageio_ffmpeg mix2k.py
+      - name: Build mix2k_dragdrop.exe
+        working-directory: src
+        run: pyinstaller --onefile --windowed --name mix2k_dragdrop --collect-all imageio_ffmpeg --collect-all tkinterdnd2 mix2k_dragdrop.py
+      - name: Build 12k.exe
+        working-directory: src
+        run: pyinstaller --onefile --windowed --name 12k --collect-all imageio_ffmpeg 12k.py
+      - name: Check outputs
+        run: dir src\dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-apps
+          path: src/dist/*.exe
+
+  build-mac:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install build tools
+        run: pip install pyinstaller imageio-ffmpeg tkinterdnd2
+      - name: Build mix2kmac.app
+        working-directory: src
+        run: pyinstaller --windowed --name mix2kmac --collect-all imageio_ffmpeg mix2kmac.py
+      - name: Build mix2kmac_dragdrop.app
+        working-directory: src
+        run: pyinstaller --windowed --name mix2kmac_dragdrop --collect-all imageio_ffmpeg --collect-all tkinterdnd2 mix2kmac_dragdrop.py
+      - name: Build 12kmac.app
+        working-directory: src
+        run: pyinstaller --windowed --name 12kmac --collect-all imageio_ffmpeg 12kmac.py
+      - name: Zip the .app bundles
+        working-directory: src/dist
+        run: |
+          ditto -c -k --sequesterRsrc --keepParent mix2kmac.app mix2kmac.app.zip
+          ditto -c -k --sequesterRsrc --keepParent mix2kmac_dragdrop.app mix2kmac_dragdrop.app.zip
+          ditto -c -k --sequesterRsrc --keepParent 12kmac.app 12kmac.app.zip
+          ls -la
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mac-apps
+          path: src/dist/*.app.zip
+
+  publish:
+    needs: [build-windows, build-mac]
+    runs-on: ubuntu-latest
+    concurrency:
+      group: build-apps-publish
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          name: windows-apps
+          path: built/windows
+      - uses: actions/download-artifact@v4
+        with:
+          name: mac-apps
+          path: built/mac
+      - name: Place apps into app/
+        run: |
+          mkdir -p app/windows app/mac
+          rm -f app/windows/*.exe app/mac/*.app.zip
+          # Old bare Mac executables are superseded by the zipped .app bundles
+          rm -f app/mix2kmac app/mix2kmac_dragdrop app/test.txt
+          cp built/windows/*.exe app/windows/
+          cp built/mac/*.app.zip app/mac/
+          ls -la app/windows app/mac
+      - name: Commit and push
+        run: |
+          git config user.name "Angel (Muse)"
+          git config user.email "angel@users.noreply.github.com"
+          git add app/
+          git diff --cached --quiet && echo "No changes to app/, nothing to commit." && exit 0
+          git commit -m "Build apps from ${GITHUB_SHA}"
+          git push
