@@ -20,14 +20,18 @@ py -3.11 main.py
 Or in Terminal, from this folder:
 
 ```
+python3 -m venv .venv
+source .venv/bin/activate
 python3 -m pip install -r requirements.txt
 python3 main.py
 ```
 
 The first run installs the Python packages (fastapi, uvicorn,
-imageio-ffmpeg). The browser opens automatically; if it does not,
-go to http://127.0.0.1:8001 yourself. Stop the app with Ctrl+C
-in the terminal window.
+imageio-ffmpeg). On a Mac the packages go into a virtual
+environment (`.venv` inside this folder) because macOS Python
+refuses system-wide pip installs (PEP 668, "externally managed
+environment"); `start-mac.command` creates that venv for you
+automatically, so double-clicking it is the easiest route.
 
 First time on a Mac, double-clicking a `.command` file may ask
 for confirmation — right-click it, choose Open With > Terminal,
@@ -57,7 +61,13 @@ shows the real ffmpeg progress.
 ## What it needs
 
 - **Python 3.11** (Windows: `py -3.11`; Mac: python3 from
-  python.org). The packages install themselves on first run.
+  python.org). The packages install themselves on first run
+  (Windows: system pip; Mac: into a `.venv` folder, see above).
+- The `web/` folder works on its own: it carries a bundled copy
+  of `src/karaoke_common.py` (see the note at the top of that
+  file). If you downloaded the whole repo, the app prefers the
+  `src/` copy; if you only downloaded `web/`, the bundled copy
+  is used. Either way, no extra files are needed.
 - **ffmpeg** — bundled automatically via imageio-ffmpeg; no
   separate install needed. The status line on the page shows
   whether it was found.

@@ -23,7 +23,12 @@ ffmpeg install is needed. The server only listens on
 
 Run it:
     Windows:  double-click start-windows.bat  (or: py -3.11 main.py)
-    Mac:      double-click start-mac.command  (or: python3 main.py)
+    Mac:      double-click start-mac.command  (or: python3 -m venv .venv
+              && source .venv/bin/activate
+              && python3 -m pip install -r requirements.txt
+              && python3 main.py)
+    (macOS Python refuses system-wide pip installs, so the Mac
+    route uses a virtual environment; start-mac.command makes it.)
 """
 
 import os
@@ -34,10 +39,16 @@ import time
 import uuid
 import webbrowser
 
-# Shared ffmpeg/demucs helpers live in src/.
-sys.path.insert(
-    0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src")
+# Shared ffmpeg/demucs helpers live in src/ -- but the web folder
+# is often downloaded on its own, so a copy is bundled here as
+# web/karaoke_common.py. Prefer the canonical src/ copy when it
+# exists (full repo checkout); otherwise fall back to the bundled
+# one in this folder (already on sys.path as the script's dir).
+_SRC_DIR = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "..", "src"
 )
+if os.path.isfile(os.path.join(_SRC_DIR, "karaoke_common.py")):
+    sys.path.insert(0, _SRC_DIR)
 import karaoke_common as kc  # noqa: E402
 
 from fastapi import FastAPI, File, Form, UploadFile  # noqa: E402
