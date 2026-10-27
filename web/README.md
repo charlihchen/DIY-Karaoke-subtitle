@@ -83,11 +83,11 @@ shows the real ffmpeg progress.
     the ~2 GB CUDA torch:
     ```
     py -3.11 -m pip install torch --index-url https://download.pytorch.org/whl/cpu
-    py -3.11 -m pip install "audio-separator[cpu]"
+    py -3.11 -m pip install "audio-separator[cpu]" audioread
     ```
   - Mac — from the `web/` folder (uses its `.venv`):
     ```
-    .venv/bin/python -m pip install "audio-separator[cpu]"
+    .venv/bin/python -m pip install "audio-separator[cpu]" audioread
     ```
     On Apple Silicon this needs PyTorch 2.13+ and macOS 14+.
     The page shows whether UVR is ready; if it is not, 12k

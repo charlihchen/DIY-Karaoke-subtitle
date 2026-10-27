@@ -61,12 +61,12 @@ tells you how to install it instead.
   then audio-separator:
   ```
   py -3.11 -m pip install torch --index-url https://download.pytorch.org/whl/cpu
-  py -3.11 -m pip install "audio-separator[cpu]"
+  py -3.11 -m pip install "audio-separator[cpu]" audioread
   ```
 - **macOS:** install Python 3, then in Terminal run
   ```
   python3 -m venv ~/uvr-env
-  ~/uvr-env/bin/pip install "audio-separator[cpu]"
+  ~/uvr-env/bin/pip install "audio-separator[cpu]" audioread
   ```
   Then make sure `audio-separator` is on PATH, e.g. add this
   line to `~/.zprofile` and reopen Terminal:

@@ -162,10 +162,10 @@ Two honest limits (unchanged):
    certificates (Windows) / a paid Apple Developer account
    ($99/year). Workarounds are in `app/README.md`.
 2. `12k` / `12kmac` still need their separator installed
-   separately — UVR (`pip install "audio-separator[cpu]"`,
-   CPU torch first on Windows) or Demucs (`pip install
-   demucs`) — bundling either makes a ~330 MB app that takes
-   2–3 minutes to start.
+   separately — UVR (`pip install "audio-separator[cpu]"
+   audioread`, CPU torch first on Windows) or Demucs (`pip
+   install demucs`) — bundling either makes a ~330 MB app that
+   takes 2–3 minutes to start.
 
 The old `src/setup.py` / `src/setup2.py` (py2app) are superseded
 by the PyInstaller + GitHub Actions build; they are kept for

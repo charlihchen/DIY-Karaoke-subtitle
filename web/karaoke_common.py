@@ -30,8 +30,8 @@ What it fixes over the original scripts:
   with ``pip install demucs``.
 * 12k can also separate with UVR (Ultimate Vocal Remover) MDX-Net
   models instead of Demucs, through the ``audio-separator``
-  package (``pip install "audio-separator[cpu]"``). UVR is the
-  engine behind the UVR5 GUI Charlih uses by hand; the same
+  package (``pip install "audio-separator[cpu]" audioread``).
+  UVR is the engine behind the UVR5 GUI Charlih uses by hand; the same
   models (Inst HQ 3, Karaoke 2, Inst HQ 4) run headlessly here.
   Like Demucs, it is NOT bundled -- torch + onnxruntime are far
   too big -- so it is installed separately and found on PATH.
@@ -187,7 +187,7 @@ def audio_separator_missing_message():
             "to bundle). On your PC, open a terminal and run:\n\n"
             "    py -3.11 -m pip install torch "
             "--index-url https://download.pytorch.org/whl/cpu\n"
-            "    py -3.11 -m pip install \"audio-separator[cpu]\"\n\n"
+            "    py -3.11 -m pip install \"audio-separator[cpu]\" audioread\n\n"
             "Install CPU torch first -- plain pip would fetch the "
             "2 GB CUDA torch instead. The first run downloads the "
             "UVR model (~60 MB) once and reuses it afterwards."
@@ -199,7 +199,7 @@ def audio_separator_missing_message():
             "installed separately (torch + onnxruntime are too big "
             "to bundle). On your Mac, open Terminal and run:\n\n"
             "    python3 -m venv ~/uvr-env\n"
-            "    ~/uvr-env/bin/pip install \"audio-separator[cpu]\"\n\n"
+            "    ~/uvr-env/bin/pip install \"audio-separator[cpu]\" audioread\n\n"
             "Then make sure audio-separator is on PATH, e.g. add "
             "this line to ~/.zprofile and reopen Terminal:\n\n"
             "    export PATH=\"$HOME/uvr-env/bin:$PATH\"\n\n"
@@ -214,7 +214,7 @@ def audio_separator_missing_message():
         "installed separately. Install it with:\n\n"
         "    pip install torch "
         "--index-url https://download.pytorch.org/whl/cpu\n"
-        "    pip install \"audio-separator[cpu]\"\n\n"
+        "    pip install \"audio-separator[cpu]\" audioread\n\n"
         "Then run this app again."
     )
 

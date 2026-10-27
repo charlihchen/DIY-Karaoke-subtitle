@@ -10,7 +10,7 @@ Pick a video and the app does the rest:
 
 Neither separator is bundled into the app (torch + friends are
 far too big -- see README). UVR needs ``pip install
-"audio-separator[cpu]"`` (in a venv on macOS); Demucs needs
+"audio-separator[cpu]" audioread`` (in a venv on macOS); Demucs needs
 ``pip install demucs``. The app checks for the chosen tool and
 tells you exactly how to install it when it is missing.
 ffmpeg ships inside the app.
