@@ -106,3 +106,8 @@ shows the real ffmpeg progress.
   web app is the same code underneath (it imports the shared
   `src/karaoke_common.py`), just with a browser UI instead of
   a separate Windows .exe and Mac .app.
+
+## Screenshot
+
+<img width="1530" height="988" alt="image" src="https://github.com/user-attachments/assets/3c74a696-1867-493c-9b10-06973628de4a" />
+
