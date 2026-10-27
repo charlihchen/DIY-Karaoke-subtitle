@@ -43,12 +43,11 @@
 <div class="chips">
   <span class="chip" id="chipFfmpeg">ffmpeg: checking…</span>
   <span class="chip" id="chipUvr">UVR: checking…</span>
-  <span class="chip" id="chipDemucs">Demucs: checking…</span>
 </div>
 
 <div class="tabs">
   <button class="tab active" id="tabMix" onclick="setMode('mix')">Mix 混音 — video + 伴奏</button>
-  <button class="tab" id="tabDemucs" onclick="setMode('demucs')">12k — video only, 分離伴奏</button>
+  <button class="tab" id="tab12k" onclick="setMode('12k')">12k — video only, 分離伴奏</button>
 </div>
 
 <form id="mixForm">
@@ -69,18 +68,9 @@
   </div>
 
   <div id="sepBlock" style="display:none">
-    <label>Separation engine 分離引擎</label>
+    <label>UVR model <span class="hint">Karaoke 2 is tuned for karaoke tracks; Inst HQ 3 is the classic instrumental model</span></label>
     <div class="pathrow">
-      <select id="backendSel" style="flex:1;padding:8px;border:1px solid #ccc;border-radius:6px;font-size:14px">
-        <option value="uvr">UVR — Ultimate Vocal Remover (same models as UVR5)</option>
-        <option value="demucs">Demucs</option>
-      </select>
-    </div>
-    <div id="uvrModelRow">
-      <label>UVR model <span class="hint">Karaoke 2 is tuned for karaoke tracks; Inst HQ 3 is the classic instrumental model</span></label>
-      <div class="pathrow">
-        <select id="modelSel" style="flex:1;padding:8px;border:1px solid #ccc;border-radius:6px;font-size:14px"></select>
-      </div>
+      <select id="modelSel" style="flex:1;padding:8px;border:1px solid #ccc;border-radius:6px;font-size:14px"></select>
     </div>
   </div>
 
@@ -106,16 +96,11 @@ let timer = null;
 function setMode(m) {
   mode = m;
   document.getElementById('tabMix').classList.toggle('active', m === 'mix');
-  document.getElementById('tabDemucs').classList.toggle('active', m === 'demucs');
+  document.getElementById('tab12k').classList.toggle('active', m === '12k');
   document.getElementById('audioBlock').style.display = m === 'mix' ? '' : 'none';
-  document.getElementById('sepBlock').style.display = m === 'demucs' ? '' : 'none';
+  document.getElementById('sepBlock').style.display = m === '12k' ? '' : 'none';
   document.getElementById('mixBtn').textContent = m === 'mix' ? 'Click here to Mix 開始混音' : 'Click here to Mix 開始 (分離 + 混音)';
 }
-
-document.getElementById('backendSel').addEventListener('change', () => {
-  const uvr = document.getElementById('backendSel').value === 'uvr';
-  document.getElementById('uvrModelRow').style.display = uvr ? '' : 'none';
-});
 
 function wireDrop(dropId, inputId, pickedId) {
   const drop = document.getElementById(dropId);
@@ -147,11 +132,8 @@ async function refreshStatus() {
     const cf = document.getElementById('chipFfmpeg');
     cf.textContent = s.ffmpeg ? '✓ ffmpeg ready' : '✗ ffmpeg missing — see web/README.md';
     cf.className = 'chip ' + (s.ffmpeg ? 'ok' : 'bad');
-    const cd = document.getElementById('chipDemucs');
-    cd.textContent = s.demucs ? '✓ Demucs ready' : '✗ Demucs not installed (only needed if you pick Demucs for 12k)';
-    cd.className = 'chip ' + (s.demucs ? 'ok' : 'bad');
     const cu = document.getElementById('chipUvr');
-    cu.textContent = s.uvr ? '✓ UVR ready' : '✗ UVR not installed (only needed for 12k with UVR)';
+    cu.textContent = s.uvr ? '✓ UVR ready' : '✗ UVR not installed (needed for 12k)';
     cu.className = 'chip ' + (s.uvr ? 'ok' : 'bad');
     const ms = document.getElementById('modelSel');
     if (s.uvr_models && !ms.options.length) {
@@ -194,7 +176,6 @@ document.getElementById('mixForm').addEventListener('submit', async e => {
     if (af) fd.append('audio', af);
     fd.append('audio_path', document.getElementById('audioPath').value);
   } else {
-    fd.append('backend', document.getElementById('backendSel').value);
     fd.append('model', document.getElementById('modelSel').value);
   }
   btn.disabled = true;

@@ -2,18 +2,16 @@
 
 Pick a video and the app does the rest:
 1. extracts the audio with ffmpeg,
-2. separates the instrumental -- with UVR (MDX-Net models, the
-   same engine as the UVR5 GUI) by default, or Demucs if you
-   pick it -- then
+2. separates the instrumental with UVR (MDX-Net models, the
+   same engine as the UVR5 GUI) -- then
 3. mixes video + instrumental + original audio into a stereo
    karaoke file -- "左伴右唱".
 
-Neither separator is bundled into the app (torch + friends are
-far too big -- see README). UVR needs ``pip install
-"audio-separator[cpu]" audioread`` (in a venv on macOS); Demucs needs
-``pip install demucs``. The app checks for the chosen tool and
-tells you exactly how to install it when it is missing.
-ffmpeg ships inside the app.
+UVR is not bundled into the app (torch + friends are far too
+big -- see README). It needs ``pip install
+"audio-separator[cpu]" audioread`` (in a venv on macOS). The
+app checks for it and tells you exactly how to install it
+when it is missing. ffmpeg ships inside the app.
 
 Built with PyInstaller into 12kmac.app (see .github/workflows/
 build-apps.yml).
@@ -29,7 +27,7 @@ import karaoke_common as kc
 class FFmpegMixerApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("Load Video & extract NoVocal.mp3 by Demucs, mix it and Video to Karaoke Song by FFmpeg")
+        self.root.title("Load Video & extract instrumental with UVR, mix it and Video to Karaoke Song by FFmpeg")
 
         self.video_label = tk.Label(root, text="Load Video File (MP4/MKV/MPG/AVI):")
         self.video_label.grid(row=0, column=0, padx=5, pady=5, sticky="w")
@@ -40,40 +38,26 @@ class FFmpegMixerApp:
         self.video_button = tk.Button(root, text="Browse", command=self.load_video)
         self.video_button.grid(row=0, column=2, padx=5, pady=5)
 
-        self.sep_label = tk.Label(root, text="Separator:")
-        self.sep_label.grid(row=1, column=0, padx=5, pady=5, sticky="w")
-
-        self.sep_combo = ttk.Combobox(
-            root, values=["UVR (MDX-Net)", "Demucs"], state="readonly", width=47
-        )
-        self.sep_combo.set("UVR (MDX-Net)")
-        self.sep_combo.grid(row=1, column=1, padx=5, pady=5)
-        self.sep_combo.bind("<<ComboboxSelected>>", self._on_separator_change)
-
         self.model_label = tk.Label(root, text="UVR model:")
-        self.model_label.grid(row=2, column=0, padx=5, pady=5, sticky="w")
+        self.model_label.grid(row=1, column=0, padx=5, pady=5, sticky="w")
 
         self.model_combo = ttk.Combobox(
             root, values=[label for _, label in kc.UVR_MODELS],
             state="readonly", width=47,
         )
         self.model_combo.set(kc.UVR_MODELS[0][1])
-        self.model_combo.grid(row=2, column=1, padx=5, pady=5)
+        self.model_combo.grid(row=1, column=1, padx=5, pady=5)
 
         self.mix_button = tk.Button(root, text="Click here to Mix", command=self.mix_media)
-        self.mix_button.grid(row=4, column=0, columnspan=3, pady=10)
+        self.mix_button.grid(row=2, column=0, columnspan=3, pady=10)
 
         self.status_label = tk.Label(root, text="", fg="blue")
-        self.status_label.grid(row=5, column=0, columnspan=3, padx=5, pady=2, sticky="w")
+        self.status_label.grid(row=3, column=0, columnspan=3, padx=5, pady=2, sticky="w")
 
         self.progress = ttk.Progressbar(root, mode="indeterminate")
-        self.progress.grid(row=6, column=0, columnspan=3, padx=5, pady=2, sticky="ew")
+        self.progress.grid(row=4, column=0, columnspan=3, padx=5, pady=2, sticky="ew")
 
         self.job = kc.BackgroundJob(root, self.status_label, [self.mix_button])
-
-    def _on_separator_change(self, event=None):
-        use_uvr = self.sep_combo.get() != "Demucs"
-        self.model_combo.config(state="readonly" if use_uvr else "disabled")
 
     def load_video(self):
         video_filename = filedialog.askopenfilename(filetypes=kc.VIDEO_TYPES)
@@ -96,29 +80,19 @@ class FFmpegMixerApp:
             messagebox.showerror("FFmpeg not found", kc.ffmpeg_missing_message())
             return
 
-        backend = "demucs" if self.sep_combo.get() == "Demucs" else "uvr"
         model = kc.UVR_MODELS[self.model_combo.current()][0]
-        if backend == "uvr":
-            tool = kc.find_audio_separator()
-            if not tool:
-                messagebox.showerror("UVR not found", kc.audio_separator_missing_message())
-                return
-            tool_kwargs = {"audio_separator": tool}
-            backend_name = f"UVR ({model})"
-        else:
-            tool = kc.find_demucs()
-            if not tool:
-                messagebox.showerror("Demucs not found", kc.demucs_missing_message())
-                return
-            tool_kwargs = {"demucs": tool}
-            backend_name = "Demucs"
+        tool = kc.find_audio_separator()
+        if not tool:
+            messagebox.showerror("UVR not found", kc.audio_separator_missing_message())
+            return
+        backend_name = f"UVR ({model})"
 
         output_file = kc.karaoke_output_path(video_file, spaced=False)
 
         def work():
             return kc.separate_and_mix(
                 ffmpeg, video_file, output_file,
-                backend=backend, model=model, **tool_kwargs,
+                model=model, audio_separator=tool,
             )
 
         def done(ok, message):
@@ -141,7 +115,5 @@ if __name__ == "__main__":
     app = FFmpegMixerApp(root)
     root.mainloop()
 
-# Make sure Demucs is installed. You can install it using pip:
-# pip install demucs
 # Created by Charlih Chen on 28AUG2024
 # https://github.com/charlihchen

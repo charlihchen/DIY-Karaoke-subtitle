@@ -127,10 +127,10 @@ run them and the first-run warnings).
 | --- | --- | --- |
 | `mix2k.exe` | Windows | Video + instrumental → karaoke file |
 | `mix2k_dragdrop.exe` | Windows | Same, with drag-and-drop |
-| `12k.exe` | Windows | Video only — UVR (default) or Demucs separates the instrumental, then mixes |
+| `12k.exe` | Windows | Video only — UVR separates the instrumental, then mixes |
 | `mix2kmac.app` | macOS | Video + instrumental → karaoke file |
 | `mix2kmac_dragdrop.app` | macOS | Same, with drag-and-drop / paste |
-| `12kmac.app` | macOS | Video only — UVR (default) or Demucs separation + mix |
+| `12kmac.app` | macOS | Video only — UVR separation + mix |
 
 What changed in the reprogram (Oct 2026):
 
@@ -144,14 +144,13 @@ What changed in the reprogram (Oct 2026):
 - Failures show ffmpeg's own error message instead of a bare
   "returned non-zero exit status".
 - `12k` / `12kmac` no longer have a hardcoded
-  `C:\Users\charl\...` Demucs path; they find Demucs on PATH and
-  explain how to install it when it is missing. Temp files are
-  always cleaned up, even when a step fails.
+  `C:\Users\charl\...` Demucs path; they find their separator
+  on PATH and explain how to install it when it is missing.
+  Temp files are always cleaned up, even when a step fails.
 - `12k` / `12kmac` now separate with UVR (MDX-Net models, the
-  same engine as the UVR5 GUI, via `audio-separator`) by
-  default, with Demucs as a second choice and a model picker
-  (Inst HQ 3, Karaoke 2, Inst HQ 4). The web app has the same
-  choice.
+  same engine as the UVR5 GUI, via `audio-separator`) only —
+  Demucs was dropped. The web app has the same UVR-only 12k
+  with a model picker (Inst HQ 3, Karaoke 2, Inst HQ 4).
 - `mix2k_dragdrop2.py` was an exact duplicate of
   `mix2k_dragdrop.py` and was removed.
 
@@ -161,10 +160,9 @@ Two honest limits (unchanged):
    Gatekeeper still warn on first run. Signing needs paid
    certificates (Windows) / a paid Apple Developer account
    ($99/year). Workarounds are in `app/README.md`.
-2. `12k` / `12kmac` still need their separator installed
-   separately — UVR (`pip install "audio-separator[cpu]"
-   audioread`, CPU torch first on Windows) or Demucs (`pip
-   install demucs`) — bundling either makes a ~330 MB app that
+2. `12k` / `12kmac` still need UVR installed separately
+   (`pip install "audio-separator[cpu]" audioread`, CPU torch
+   first on Windows) — bundling it makes a ~330 MB app that
    takes 2–3 minutes to start.
 
 The old `src/setup.py` / `src/setup2.py` (py2app) are superseded
@@ -187,6 +185,5 @@ instrumental into the page (or paste their paths — pasted paths
 are read straight from the computer, so big videos do not need
 to upload), watch the real progress bar, and download the
 finished file. See `web/README.md` for the full instructions.
-The 12k mode needs its separator installed separately — UVR
-(default) or Demucs; see `web/README.md`.
+The 12k mode needs UVR installed separately; see `web/README.md`.
 

@@ -10,7 +10,7 @@ so this folder always holds the latest builds.
 | --- | --- |
 | `mix2k.exe` | Pick a video + an instrumental track, mix into a karaoke file (左伴右唱) |
 | `mix2k_dragdrop.exe` | Same, but drag-and-drop the files in |
-| `12k.exe` | Pick a video only — separates the instrumental with UVR (default) or Demucs, then mixes. Needs the chosen separator installed separately (see below) |
+| `12k.exe` | Pick a video only — separates the instrumental with UVR, then mixes. Needs UVR installed separately (see below) |
 
 Double-click to run. The output `.mkv` is saved next to the video
 you picked. ffmpeg is bundled inside each app — no separate
@@ -26,7 +26,7 @@ Windows SmartScreen may say "Windows protected your PC". Click
 | --- | --- |
 | `mix2kmac.app.zip` | Pick a video + an instrumental track, mix into a karaoke file |
 | `mix2kmac_dragdrop.app.zip` | Same, but drag-and-drop (or Cmd-V paste a path) |
-| `12kmac.app.zip` | Pick a video only — UVR (default) or Demucs separation + mix. Needs the chosen separator installed separately (see below) |
+| `12kmac.app.zip` | Pick a video only — UVR separation + mix. Needs UVR installed separately (see below) |
 
 Unzip, then drag the `.app` into Applications (or anywhere) and
 double-click. The output `.mkv` is saved next to the video you
@@ -44,16 +44,15 @@ xattr -d com.apple.quarantine /Applications/mix2kmac.app
 
 Signing would need a paid Apple Developer account ($99/year).
 
-## 12k / 12kmac and the separator (UVR or Demucs)
+## 12k / 12kmac and UVR
 
-`12k` / `12kmac` separate the vocal out of a song, then mix.
-You pick the engine on the app: **UVR** (default — the same
-MDX-Net models the UVR5 GUI uses, via the `audio-separator`
-package; the model picker offers Inst HQ 3, Karaoke 2,
-Inst HQ 4) or **Demucs**. Neither engine is bundled into the
-app: bundling torch makes a ~330 MB file that takes 2–3
-minutes to start, so the app checks for the chosen tool and
-tells you how to install it instead.
+`12k` / `12kmac` separate the vocal out of a song with UVR
+(the same MDX-Net models the UVR5 GUI uses, via the
+`audio-separator` package; the model picker offers Inst HQ 3,
+Karaoke 2, Inst HQ 4), then mix. UVR is **not** bundled into
+the app: bundling torch makes a ~330 MB file that takes 2–3
+minutes to start, so the app checks for it and tells you how
+to install it instead.
 
 **UVR (audio-separator):**
 - **Windows:** install Python 3.11, then in Terminal run
@@ -77,14 +76,8 @@ tells you how to install it instead.
 The first 12k run downloads the chosen UVR model (~60 MB)
 once and reuses it afterwards.
 
-**Demucs:**
-- **Windows:** install Python 3.11, then in Terminal run
-  `py -3.11 -m pip install demucs`
-- **macOS:** install Python 3, then in Terminal run
-  `pip install demucs`
-
-After that, run the app again. The separator + ffmpeg do the
-heavy lifting, so a song takes a few minutes depending on your
+After that, run the app again. UVR + ffmpeg do the heavy
+lifting, so a song takes a few minutes depending on your
 machine.
 
 ## Building locally (optional)

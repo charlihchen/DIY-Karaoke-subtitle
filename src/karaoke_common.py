@@ -18,23 +18,18 @@ What it fixes over the original scripts:
   working directory, which for a double-clicked app is
   unpredictable (often the user's home folder). Output now goes
   next to the source video, where the user expects it.
-* The GUI no longer freezes while ffmpeg/demucs runs: the work
+* The GUI no longer freezes while ffmpeg/UVR runs: the work
   runs in a background thread with a status line, and the Mix
   button is disabled until it finishes.
 * Errors show ffmpeg's own last lines, so a failure is diagnosable.
-* 12k no longer has a hardcoded ``C:\\Users\\charl\\...`` path
-  for demucs; it looks for ``demucs`` on PATH and explains how
-  to install it when it is missing. Demucs itself is NOT bundled
-  (bundling it makes a ~330 MB exe that takes 2-3 minutes to
-  start -- see README), so 12k still needs a Python install
-  with ``pip install demucs``.
-* 12k can also separate with UVR (Ultimate Vocal Remover) MDX-Net
-  models instead of Demucs, through the ``audio-separator``
-  package (``pip install "audio-separator[cpu]" audioread``).
-  UVR is the engine behind the UVR5 GUI Charlih uses by hand; the same
+* 12k separates with UVR (Ultimate Vocal Remover) MDX-Net
+  models, through the ``audio-separator`` package
+  (``pip install "audio-separator[cpu]" audioread``). UVR is
+  the engine behind the UVR5 GUI Charlih uses by hand; the same
   models (Inst HQ 3, Karaoke 2, Inst HQ 4) run headlessly here.
-  Like Demucs, it is NOT bundled -- torch + onnxruntime are far
-  too big -- so it is installed separately and found on PATH.
+  It is NOT bundled -- torch + onnxruntime are far too big --
+  so it is installed separately and found on PATH (or in the
+  web app's own venv).
 """
 
 import os
@@ -145,11 +140,6 @@ def ffmpeg_missing_message():
     )
 
 
-def find_demucs():
-    """Locate the demucs command. Returns the path, or None."""
-    return shutil.which("demucs")
-
-
 # UVR (Ultimate Vocal Remover) MDX-Net models, run through the
 # `audio-separator` package. Same models the UVR5 GUI uses.
 # Inst HQ 3 is the classic instrumental model; Karaoke 2 is
@@ -215,33 +205,6 @@ def audio_separator_missing_message():
         "    pip install torch "
         "--index-url https://download.pytorch.org/whl/cpu\n"
         "    pip install \"audio-separator[cpu]\" audioread\n\n"
-        "Then run this app again."
-    )
-
-
-def demucs_missing_message():
-    if os.name == "nt":
-        return (
-            "Demucs was not found.\n\n"
-            "12k needs Demucs installed separately (it is too big to "
-            "bundle into the app). On your PC, open a terminal and run:\n\n"
-            "    py -3.11 -m pip install demucs\n\n"
-            "That needs Python 3.11 installed first. After installing, "
-            "run this app again. FFmpeg is still needed as well."
-        )
-    if sys.platform == "darwin":
-        return (
-            "Demucs was not found.\n\n"
-            "12k needs Demucs installed separately (it is too big to "
-            "bundle into the app). On your Mac, open Terminal and run:\n\n"
-            "    pip install demucs\n\n"
-            "That needs Python 3 installed first. After installing, "
-            "run this app again. FFmpeg is still needed as well."
-        )
-    return (
-        "Demucs was not found.\n\n"
-        "12k needs Demucs installed separately. Install it with:\n\n"
-        "    pip install demucs\n\n"
         "Then run this app again."
     )
 
@@ -419,8 +382,7 @@ def separate_vocals_uvr(ffmpeg, audio_separator, video_file, output_file,
                          on_progress=None):
     """12k pipeline with UVR: extract wav -> audio-separator -> mix.
 
-    Same shape as :func:`separate_vocals_and_mix`, but the
-    instrumental comes from a UVR MDX-Net model (the same models
+    The instrumental comes from a UVR MDX-Net model (the same models
     the UVR5 GUI uses) via the ``audio-separator`` command.
     Only the instrumental stem is produced (``--single_stem
     instrumental``); it is found by name, because audio-separator
@@ -496,101 +458,17 @@ def separate_vocals_uvr(ffmpeg, audio_separator, video_file, output_file,
         shutil.rmtree(workdir, ignore_errors=True)
 
 
-def separate_and_mix(ffmpeg, video_file, output_file, backend="uvr",
-                     model=UVR_DEFAULT_MODEL, demucs=None,
+def separate_and_mix(ffmpeg, video_file, output_file,
+                     model=UVR_DEFAULT_MODEL,
                      audio_separator=None, on_stage=None, on_progress=None):
-    """12k pipeline with the chosen separator backend.
+    """12k pipeline: separate the instrumental with UVR, then mix.
 
-    ``backend`` is "uvr" (UVR MDX-Net via audio-separator, the
-    default) or "demucs". Returns (ok, message); a missing
-    separator tool returns (False, install instructions) instead
-    of raising.
+    Returns (ok, message); a missing audio-separator returns
+    (False, install instructions) instead of raising.
     """
-    if backend == "demucs":
-        if not demucs:
-            return False, demucs_missing_message()
-        return separate_vocals_and_mix(
-            ffmpeg, demucs, video_file, output_file,
-            on_stage=on_stage, on_progress=on_progress,
-        )
     if not audio_separator:
         return False, audio_separator_missing_message()
     return separate_vocals_uvr(
         ffmpeg, audio_separator, video_file, output_file,
         model=model, on_stage=on_stage, on_progress=on_progress,
     )
-
-
-def separate_vocals_and_mix(ffmpeg, demucs, video_file, output_file,
-                            on_stage=None, on_progress=None):
-    """12k pipeline: extract wav -> Demucs -> mix. Returns (ok, message).
-
-    All temporary files live in a temp dir that is always cleaned
-    up, even when a step fails (the original left the .wav behind
-    whenever Demucs failed). The instrumental track is found with
-    a glob, because the model folder name depends on the Demucs
-    version (htdemucs, htdemucs_ft, ...).
-
-    ``on_stage`` is called with a short status string at each
-    step and ``on_progress`` with a 0.0-1.0 fraction during the
-    final mix (both optional; the desktop apps pass neither).
-    """
-    import glob
-    import tempfile
-
-    stem = os.path.splitext(os.path.basename(video_file))[0]
-    workdir = tempfile.mkdtemp(prefix="ktv12k_")
-    try:
-        if on_stage:
-            on_stage("Extracting audio from the video...")
-        wav_file = os.path.join(workdir, f"{stem}.wav")
-        ok, message = run_ffmpeg([ffmpeg, "-y", "-i", video_file, wav_file])
-        if not ok:
-            return False, f"Could not extract audio from the video.\n{message}"
-
-        if on_stage:
-            on_stage("Separating vocals with Demucs (this takes a few minutes)...")
-        demucs_out = os.path.join(workdir, "demucs_output")
-        os.makedirs(demucs_out, exist_ok=True)
-        try:
-            proc = subprocess.run(
-                [demucs, "--two-stems=vocals", "-o", demucs_out,
-                 "--mp3", wav_file],
-                capture_output=True,
-                text=True,
-                creationflags=(
-                    subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0
-                ),
-            )
-        except FileNotFoundError:
-            return False, "Demucs executable was not found."
-        if proc.returncode != 0:
-            detail = tail_lines(proc.stderr) or tail_lines(proc.stdout)
-            return False, f"Demucs failed (exit {proc.returncode}).\n{detail}"
-
-        matches = glob.glob(
-            os.path.join(demucs_out, "**", "no_vocals.mp3"), recursive=True
-        )
-        if not matches:
-            return False, (
-                "Demucs finished but no instrumental file "
-                "(no_vocals.mp3) was found in its output."
-            )
-        instrumental = matches[0]
-
-        if on_stage:
-            on_stage("Mixing video + instrumental...")
-        total = media_duration(ffmpeg, video_file)
-        return run_ffmpeg_progress([
-            ffmpeg,
-            "-y",
-            "-i", video_file,
-            "-i", instrumental,
-            "-map", "0:v",
-            "-filter_complex",
-            "[1:a][0:a]amerge=inputs=2,pan=stereo|c0<c0+c1|c1<c2+c3[a]",
-            "-map", "[a]",
-            output_file,
-        ], total_seconds=total, on_progress=on_progress)
-    finally:
-        shutil.rmtree(workdir, ignore_errors=True)

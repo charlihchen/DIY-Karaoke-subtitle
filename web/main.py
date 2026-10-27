@@ -8,8 +8,7 @@ Runs on your own computer and opens in the browser
   channel, original (vocal) audio on the right ("左伴右唱").
 * 12k mode: pick a video only. The app separates the
   instrumental with UVR (Ultimate Vocal Remover MDX-Net models,
-  via the ``audio-separator`` package) by default, or with
-  Demucs if you pick it. Either separator is installed
+  via the ``audio-separator`` package). UVR is installed
   separately -- see the status line on the page.
 
 Files can be dragged into the browser (they upload to this
@@ -40,7 +39,7 @@ import time
 import uuid
 import webbrowser
 
-# Shared ffmpeg/demucs helpers live in src/ -- but the web folder
+# Shared ffmpeg helpers live in src/ -- but the web folder
 # is often downloaded on its own, so a copy is bundled here as
 # web/karaoke_common.py. Prefer the canonical src/ copy when it
 # exists (full repo checkout); otherwise fall back to the bundled
@@ -188,7 +187,7 @@ def _venv_bin_dir():
     return None
 
 
-def _run_12k(job_id, video_file, backend="uvr", model=None):
+def _run_12k(job_id, video_file, model=None):
     ffmpeg = kc.find_ffmpeg()
     if not ffmpeg:
         _finish(job_id, False, kc.ffmpeg_missing_message())
@@ -208,8 +207,7 @@ def _run_12k(job_id, video_file, backend="uvr", model=None):
     search_dirs = [d for d in [_venv_bin_dir()] if d]
     ok, message = kc.separate_and_mix(
         ffmpeg, video_file, output_file,
-        backend=backend, model=model,
-        demucs=kc.find_demucs(),
+        model=model,
         audio_separator=kc.find_audio_separator(search_dirs),
         on_stage=on_stage, on_progress=on_progress,
     )
@@ -228,13 +226,10 @@ def index():
 @app.get("/api/status")
 def status():
     ffmpeg = kc.find_ffmpeg()
-    demucs = kc.find_demucs()
     uvr = kc.find_audio_separator([d for d in [_venv_bin_dir()] if d])
     return {
         "ffmpeg": bool(ffmpeg),
         "ffmpeg_path": ffmpeg or "",
-        "demucs": bool(demucs),
-        "demucs_path": demucs or "",
         "uvr": bool(uvr),
         "uvr_path": uvr or "",
         "uvr_models": [
@@ -275,17 +270,14 @@ def download(job_id: str):
 @app.post("/api/mix")
 def start_mix(
     mode: str = Form("mix"),
-    backend: str = Form("uvr"),
     model: str = Form(""),
     video: UploadFile = File(None),
     audio: UploadFile = File(None),
     video_path: str = Form(""),
     audio_path: str = Form(""),
 ):
-    if mode not in ("mix", "demucs"):
+    if mode not in ("mix", "12k"):
         return JSONResponse({"error": "Unknown mode."}, status_code=400)
-    if backend not in ("uvr", "demucs"):
-        backend = "uvr"
     job_id = _new_job(mode, (video.filename if video else "") or os.path.basename(video_path))
     job_dir = os.path.join(WORK_DIR, job_id)
     os.makedirs(job_dir, exist_ok=True)
@@ -312,7 +304,7 @@ def start_mix(
         )
     else:
         thread = threading.Thread(
-            target=_run_12k, args=(job_id, video_file, backend, model),
+            target=_run_12k, args=(job_id, video_file, model),
             daemon=True,
         )
     thread.start()
