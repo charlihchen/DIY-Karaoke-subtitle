@@ -83,10 +83,16 @@ shows the real ffmpeg progress.
     py -3.11 -m pip install torch --index-url https://download.pytorch.org/whl/cpu
     py -3.11 -m pip install "audio-separator[cpu]" audioread
     ```
-  - Mac — from the `web/` folder (uses its `.venv`):
+  - Mac — UVR needs its own Python 3.13 venv (your Mac's
+    python3 is 3.15, and onnxruntime has no 3.15 version yet,
+    so installing into the web app's `.venv` fails):
     ```
-    .venv/bin/python -m pip install "audio-separator[cpu]" audioread
+    brew install python@3.13
+    /opt/homebrew/bin/python3.13 -m venv ~/uvr-env
+    ~/uvr-env/bin/pip install torch "audio-separator[cpu]" audioread
+    echo 'export PATH="$HOME/uvr-env/bin:$PATH"' >> ~/.zprofile
     ```
+    Reopen Terminal afterwards so the PATH change takes effect.
     On Apple Silicon this needs PyTorch 2.13+ and macOS 14+.
     The page shows whether UVR is ready; if it is not, 12k
     mode explains how to install it.

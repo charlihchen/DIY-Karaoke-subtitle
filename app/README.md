@@ -62,10 +62,13 @@ to install it instead.
   py -3.11 -m pip install torch --index-url https://download.pytorch.org/whl/cpu
   py -3.11 -m pip install "audio-separator[cpu]" audioread
   ```
-- **macOS:** install Python 3, then in Terminal run
+- **macOS:** UVR needs its own Python 3.13 venv (Homebrew's
+  python3 is 3.15, and onnxruntime has no 3.15 version yet).
+  In Terminal run
   ```
-  python3 -m venv ~/uvr-env
-  ~/uvr-env/bin/pip install "audio-separator[cpu]" audioread
+  brew install python@3.13
+  /opt/homebrew/bin/python3.13 -m venv ~/uvr-env
+  ~/uvr-env/bin/pip install torch "audio-separator[cpu]" audioread
   ```
   Then make sure `audio-separator` is on PATH, e.g. add this
   line to `~/.zprofile` and reopen Terminal:
