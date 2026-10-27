@@ -164,3 +164,21 @@ The old `src/setup.py` / `src/setup2.py` (py2app) are superseded
 by the PyInstaller + GitHub Actions build; they are kept for
 reference only.
 
+## Web app — one app for Windows and Mac
+
+If you would rather not juggle a Windows .exe and a Mac .app,
+there is now a web version in `web/` — the same mix and 12k
+jobs, but you use it in the browser. One codebase, both systems.
+
+```
+Windows: double-click web/start-windows.bat
+Mac:     double-click web/start-mac.command
+```
+
+It opens at http://127.0.0.1:8001. Drag the video and the
+instrumental into the page (or paste their paths — pasted paths
+are read straight from the computer, so big videos do not need
+to upload), watch the real progress bar, and download the
+finished file. See `web/README.md` for the full instructions.
+The 12k mode still needs Demucs installed separately.
+

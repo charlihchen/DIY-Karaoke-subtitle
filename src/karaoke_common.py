@@ -1,9 +1,9 @@
 """Shared helpers for the DIY-Karaoke-subtitle apps.
 
 Every app in this folder (mix2k, mix2kmac, mix2k_dragdrop,
-mix2kmac_dragdrop, 12k, 12kmac) imports this module. PyInstaller
-includes it automatically because it is a plain import in the
-same directory.
+mix2kmac_dragdrop, 12k, 12kmac) imports this module, and so does
+the web app in ``web/``. PyInstaller includes it automatically
+because it is a plain import in the same directory.
 
 What it fixes over the original scripts:
 
@@ -237,6 +237,83 @@ class BackgroundJob:
         done(ok, message)
 
 
+def media_duration(ffmpeg, path):
+    """Duration of a media file in seconds, via ``ffmpeg -i``.
+
+    Uses ffmpeg itself (not ffprobe) because the bundled static
+    ffmpeg from imageio-ffmpeg ships no ffprobe binary.
+    Returns None when the duration cannot be read.
+    """
+    import re
+
+    try:
+        proc = subprocess.run(
+            [ffmpeg, "-i", path],
+            capture_output=True,
+            text=True,
+            creationflags=(
+                subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0
+            ),
+        )
+    except (FileNotFoundError, OSError):
+        return None
+    match = re.search(r"Duration: (\d+):(\d+):([\d.]+)", proc.stderr or "")
+    if not match:
+        return None
+    hours, minutes, seconds = match.groups()
+    return int(hours) * 3600 + int(minutes) * 60 + float(seconds)
+
+
+def _parse_ffmpeg_time(text):
+    """Parse an ffmpeg ``time=HH:MM:SS.xx`` stamp to seconds."""
+    import re
+
+    match = re.search(r"time=(\d+):(\d+):([\d.]+)", text or "")
+    if not match:
+        return None
+    hours, minutes, seconds = match.groups()
+    return int(hours) * 3600 + int(minutes) * 60 + float(seconds)
+
+
+def run_ffmpeg_progress(args, total_seconds=None, on_progress=None):
+    """Run ffmpeg, reporting progress. Returns (ok, message).
+
+    ``on_progress`` is called with a 0.0-1.0 fraction whenever
+    ffmpeg reports a new ``time=`` stamp (only when the total
+    duration is known). Used by the web app for a real progress
+    bar; the desktop apps use plain :func:`run_ffmpeg`.
+    """
+    try:
+        proc = subprocess.Popen(
+            args,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            errors="replace",
+            creationflags=(
+                subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0
+            ),
+        )
+    except FileNotFoundError:
+        return False, "FFmpeg executable was not found."
+    stderr_lines = []
+    try:
+        for line in proc.stderr:
+            stderr_lines.append(line)
+            if on_progress and total_seconds:
+                current = _parse_ffmpeg_time(line)
+                if current is not None:
+                    on_progress(min(current / total_seconds, 1.0))
+        proc.wait()
+    except Exception as exc:  # noqa: BLE001 - report to caller
+        proc.kill()
+        return False, f"FFmpeg failed to run: {exc}"
+    if proc.returncode == 0:
+        return True, "Done."
+    detail = tail_lines("".join(stderr_lines))
+    return False, f"FFmpeg failed (exit {proc.returncode}).\n{detail}"
+
+
 def run_ffmpeg(args, timeout=None):
     """Run ffmpeg, capturing output. Returns (ok, message)."""
     try:
@@ -261,7 +338,8 @@ def run_ffmpeg(args, timeout=None):
     return False, f"FFmpeg failed (exit {proc.returncode}).\n{detail}"
 
 
-def separate_vocals_and_mix(ffmpeg, demucs, video_file, output_file):
+def separate_vocals_and_mix(ffmpeg, demucs, video_file, output_file,
+                            on_stage=None, on_progress=None):
     """12k pipeline: extract wav -> Demucs -> mix. Returns (ok, message).
 
     All temporary files live in a temp dir that is always cleaned
@@ -269,6 +347,10 @@ def separate_vocals_and_mix(ffmpeg, demucs, video_file, output_file):
     whenever Demucs failed). The instrumental track is found with
     a glob, because the model folder name depends on the Demucs
     version (htdemucs, htdemucs_ft, ...).
+
+    ``on_stage`` is called with a short status string at each
+    step and ``on_progress`` with a 0.0-1.0 fraction during the
+    final mix (both optional; the desktop apps pass neither).
     """
     import glob
     import tempfile
@@ -276,11 +358,15 @@ def separate_vocals_and_mix(ffmpeg, demucs, video_file, output_file):
     stem = os.path.splitext(os.path.basename(video_file))[0]
     workdir = tempfile.mkdtemp(prefix="ktv12k_")
     try:
+        if on_stage:
+            on_stage("Extracting audio from the video...")
         wav_file = os.path.join(workdir, f"{stem}.wav")
         ok, message = run_ffmpeg([ffmpeg, "-y", "-i", video_file, wav_file])
         if not ok:
             return False, f"Could not extract audio from the video.\n{message}"
 
+        if on_stage:
+            on_stage("Separating vocals with Demucs (this takes a few minutes)...")
         demucs_out = os.path.join(workdir, "demucs_output")
         os.makedirs(demucs_out, exist_ok=True)
         try:
@@ -309,7 +395,10 @@ def separate_vocals_and_mix(ffmpeg, demucs, video_file, output_file):
             )
         instrumental = matches[0]
 
-        return run_ffmpeg([
+        if on_stage:
+            on_stage("Mixing video + instrumental...")
+        total = media_duration(ffmpeg, video_file)
+        return run_ffmpeg_progress([
             ffmpeg,
             "-y",
             "-i", video_file,
@@ -319,6 +408,6 @@ def separate_vocals_and_mix(ffmpeg, demucs, video_file, output_file):
             "[1:a][0:a]amerge=inputs=2,pan=stereo|c0<c0+c1|c1<c2+c3[a]",
             "-map", "[a]",
             output_file,
-        ])
+        ], total_seconds=total, on_progress=on_progress)
     finally:
         shutil.rmtree(workdir, ignore_errors=True)

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DIY Karaoke — 動手做 KTV</title>
+<style>
+  body { font-family: -apple-system, "Segoe UI", "Microsoft JhengHei", "PingFang TC", sans-serif; max-width: 720px; margin: 24px auto; padding: 0 16px; color: #222; }
+  h1 { font-size: 22px; margin-bottom: 4px; }
+  .sub { color: #666; margin-bottom: 16px; }
+  .chips { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .chip { padding: 4px 10px; border-radius: 12px; font-size: 13px; background: #eee; }
+  .chip.ok { background: #dcf5e3; }
+  .chip.bad { background: #fbdcdc; }
+  .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+  .tab { padding: 8px 16px; border: 1px solid #ccc; border-radius: 8px; background: #fff; cursor: pointer; font-size: 15px; }
+  .tab.active { background: #222; color: #fff; border-color: #222; }
+  .drop { border: 2px dashed #aaa; border-radius: 10px; padding: 22px; text-align: center; margin-bottom: 8px; background: #fafafa; cursor: pointer; }
+  .drop.over { border-color: #222; background: #f0f0f0; }
+  .drop .picked { color: #0a7d2c; font-weight: bold; word-break: break-all; }
+  .pathrow { display: flex; gap: 6px; margin-bottom: 16px; }
+  .pathrow input { flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
+  label { display: block; font-weight: bold; margin: 12px 0 6px; }
+  .hint { color: #666; font-size: 13px; font-weight: normal; }
+  button.big { width: 100%; padding: 12px; font-size: 17px; border: none; border-radius: 8px; background: #222; color: #fff; cursor: pointer; margin-top: 8px; }
+  button.big:disabled { background: #999; cursor: default; }
+  #progressWrap { display: none; margin-top: 16px; }
+  #barOuter { height: 16px; background: #eee; border-radius: 8px; overflow: hidden; }
+  #barInner { height: 100%; width: 0%; background: #2e8b57; }
+  #stage { margin-top: 8px; }
+  #result { margin-top: 12px; white-space: pre-wrap; }
+  #result.error { color: #b00020; }
+  #downloadBtn { display: none; margin-top: 10px; padding: 10px 16px; font-size: 15px; border-radius: 8px; background: #2e8b57; color: #fff; text-decoration: none; }
+  #jobs { margin-top: 24px; }
+  #jobs li { margin-bottom: 6px; word-break: break-all; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<h1>DIY Karaoke — 動手做 KTV</h1>
+<div class="sub">One web app for Windows and Mac. Runs on this computer only.</div>
+
+<div class="chips">
+  <span class="chip" id="chipFfmpeg">ffmpeg: checking…</span>
+  <span class="chip" id="chipDemucs">Demucs: checking…</span>
+</div>
+
+<div class="tabs">
+  <button class="tab active" id="tabMix" onclick="setMode('mix')">Mix 混音 — video + 伴奏</button>
+  <button class="tab" id="tabDemucs" onclick="setMode('demucs')">12k — video only, Demucs 分離伴奏</button>
+</div>
+
+<form id="mixForm">
+  <label>Video 歌影 <span class="hint">MP4 / MKV / MPG / AVI — drag it here, click to browse, or paste its path below</span></label>
+  <div class="drop" id="videoDrop">Drop video file here, or click to browse
+    <div class="picked" id="videoPicked"></div>
+  </div>
+  <input type="file" id="videoFile" accept="video/*,.mkv,.avi,.mpg" class="hidden">
+  <div class="pathrow"><input type="text" id="videoPath" placeholder="Or paste the video's full path on this computer, e.g. C:\Videos\song.mp4"></div>
+
+  <div id="audioBlock">
+    <label>Instrumental audio 伴奏 <span class="hint">MP3 / M4A — drag it here, click to browse, or paste its path below</span></label>
+    <div class="drop" id="audioDrop">Drop audio file here, or click to browse
+      <div class="picked" id="audioPicked"></div>
+    </div>
+    <input type="file" id="audioFile" accept="audio/*" class="hidden">
+    <div class="pathrow"><input type="text" id="audioPath" placeholder="Or paste the audio's full path on this computer"></div>
+  </div>
+
+  <button type="submit" class="big" id="mixBtn">Click here to Mix 開始混音</button>
+</form>
+
+<div id="progressWrap">
+  <div id="barOuter"><div id="barInner"></div></div>
+  <div id="stage"></div>
+  <div id="result"></div>
+  <a id="downloadBtn" href="#">Download the mixed file 下載成品</a>
+</div>
+
+<div id="jobs">
+  <h3>Recent jobs</h3>
+  <ul id="jobList"><li>None yet.</li></ul>
+</div>
+
+<script>
+let mode = 'mix';
+let timer = null;
+
+function setMode(m) {
+  mode = m;
+  document.getElementById('tabMix').classList.toggle('active', m === 'mix');
+  document.getElementById('tabDemucs').classList.toggle('active', m === 'demucs');
+  document.getElementById('audioBlock').style.display = m === 'mix' ? '' : 'none';
+  document.getElementById('mixBtn').textContent = m === 'mix' ? 'Click here to Mix 開始混音' : 'Click here to Mix 開始 (Demucs 分離 + 混音)';
+}
+
+function wireDrop(dropId, inputId, pickedId) {
+  const drop = document.getElementById(dropId);
+  const input = document.getElementById(inputId);
+  const picked = document.getElementById(pickedId);
+  drop.addEventListener('click', () => input.click());
+  input.addEventListener('change', () => {
+    if (input.files.length) picked.textContent = '✓ ' + input.files[0].name;
+  });
+  ['dragover', 'dragenter'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
+  ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
+  drop.addEventListener('drop', e => {
+    const f = e.dataTransfer.files[0];
+    if (f) {
+      const dt = new DataTransfer();
+      dt.items.add(f);
+      input.files = dt.files;
+      picked.textContent = '✓ ' + f.name;
+    }
+  });
+}
+wireDrop('videoDrop', 'videoFile', 'videoPicked');
+wireDrop('audioDrop', 'audioFile', 'audioPicked');
+
+async function refreshStatus() {
+  try {
+    const r = await fetch('/api/status');
+    const s = await r.json();
+    const cf = document.getElementById('chipFfmpeg');
+    cf.textContent = s.ffmpeg ? '✓ ffmpeg ready' : '✗ ffmpeg missing — see web/README.md';
+    cf.className = 'chip ' + (s.ffmpeg ? 'ok' : 'bad');
+    const cd = document.getElementById('chipDemucs');
+    cd.textContent = s.demucs ? '✓ Demucs ready' : '✗ Demucs not installed (only needed for 12k mode)';
+    cd.className = 'chip ' + (s.demucs ? 'ok' : 'bad');
+  } catch (e) { /* server still starting */ }
+}
+
+async function refreshJobs() {
+  try {
+    const r = await fetch('/api/jobs');
+    const jobs = await r.json();
+    const ul = document.getElementById('jobList');
+    if (!jobs.length) { ul.innerHTML = '<li>None yet.</li>'; return; }
+    ul.innerHTML = jobs.map(j => {
+      const link = j.status === 'done'
+        ? ' — <a href="/api/download/' + j.id + '">download</a>' : '';
+      return '<li>' + (j.video_name || j.id) + ' [' + j.mode + '] — ' + j.status +
+        ' (' + Math.round(j.progress * 100) + '%)' + link + '</li>';
+    }).join('');
+  } catch (e) { /* ignore */ }
+}
+
+document.getElementById('mixForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = document.getElementById('mixBtn');
+  const fd = new FormData();
+  fd.append('mode', mode);
+  const vf = document.getElementById('videoFile').files[0];
+  if (vf) fd.append('video', vf);
+  fd.append('video_path', document.getElementById('videoPath').value);
+  if (mode === 'mix') {
+    const af = document.getElementById('audioFile').files[0];
+    if (af) fd.append('audio', af);
+    fd.append('audio_path', document.getElementById('audioPath').value);
+  }
+  btn.disabled = true;
+  document.getElementById('progressWrap').style.display = 'block';
+  document.getElementById('result').textContent = '';
+  document.getElementById('result').className = '';
+  document.getElementById('downloadBtn').style.display = 'none';
+  document.getElementById('stage').textContent = 'Uploading / starting…';
+  let jobId;
+  try {
+    const r = await fetch('/api/mix', { method: 'POST', body: fd });
+    const data = await r.json();
+    jobId = data.job_id;
+  } catch (err) {
+    document.getElementById('stage').textContent = '';
+    document.getElementById('result').textContent = 'Could not reach the server: ' + err;
+    document.getElementById('result').className = 'error';
+    btn.disabled = false;
+    return;
+  }
+  if (timer) clearInterval(timer);
+  timer = setInterval(async () => {
+    const r = await fetch('/api/jobs/' + jobId);
+    const j = await r.json();
+    document.getElementById('barInner').style.width = Math.round(j.progress * 100) + '%';
+    document.getElementById('stage').textContent = j.stage || '';
+    if (j.status === 'done' || j.status === 'error') {
+      clearInterval(timer);
+      btn.disabled = false;
+      document.getElementById('result').textContent = j.message || (j.status === 'done' ? 'Done!' : 'Failed.');
+      document.getElementById('result').className = j.status === 'error' ? 'error' : '';
+      if (j.status === 'done') {
+        const dl = document.getElementById('downloadBtn');
+        dl.href = '/api/download/' + jobId;
+        dl.style.display = 'inline-block';
+      }
+      refreshJobs();
+    }
+  }, 500);
+});
+
+refreshStatus();
+refreshJobs();
+setInterval(refreshStatus, 10000);
+</script>
+</body>
+</html>
