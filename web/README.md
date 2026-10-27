@@ -45,10 +45,10 @@ Two modes, picked at the top of the page:
    (歌影) and the audio (伴奏) into the boxes, or click a box to
    browse. Builds the stereo karaoke file: instrumental left,
    original vocal right (左伴右唱).
-2. **12k** — video only. Separates the instrumental first
+2. **12k** — 1 click 2(to) K歌. Separates(**分離**成伴奏) the instrumental first
    with UVR (the same MDX-Net models the UVR5 GUI uses, via
    the `audio-separator` package; model picker offers Inst HQ 3,
-   Karaoke 2, Inst HQ 4), then mixes. UVR is installed
+   Karaoke 2, Inst HQ 4), then mixes(然後再跟原音樂檔**混音**). UVR is installed
    separately — see below.
 
 Instead of uploading, you can paste a file's full path in the
