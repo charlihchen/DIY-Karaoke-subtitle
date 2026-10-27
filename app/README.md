@@ -10,7 +10,7 @@ so this folder always holds the latest builds.
 | --- | --- |
 | `mix2k.exe` | Pick a video + an instrumental track, mix into a karaoke file (左伴右唱) |
 | `mix2k_dragdrop.exe` | Same, but drag-and-drop the files in |
-| `12k.exe` | Pick a video only — separates the instrumental with Demucs, then mixes. Needs Demucs installed separately (see below) |
+| `12k.exe` | Pick a video only — separates the instrumental with UVR (default) or Demucs, then mixes. Needs the chosen separator installed separately (see below) |
 
 Double-click to run. The output `.mkv` is saved next to the video
 you picked. ffmpeg is bundled inside each app — no separate
@@ -26,7 +26,7 @@ Windows SmartScreen may say "Windows protected your PC". Click
 | --- | --- |
 | `mix2kmac.app.zip` | Pick a video + an instrumental track, mix into a karaoke file |
 | `mix2kmac_dragdrop.app.zip` | Same, but drag-and-drop (or Cmd-V paste a path) |
-| `12kmac.app.zip` | Pick a video only — Demucs separation + mix. Needs Demucs installed separately (see below) |
+| `12kmac.app.zip` | Pick a video only — UVR (default) or Demucs separation + mix. Needs the chosen separator installed separately (see below) |
 
 Unzip, then drag the `.app` into Applications (or anywhere) and
 double-click. The output `.mkv` is saved next to the video you
@@ -44,20 +44,48 @@ xattr -d com.apple.quarantine /Applications/mix2kmac.app
 
 Signing would need a paid Apple Developer account ($99/year).
 
-## 12k / 12kmac and Demucs
+## 12k / 12kmac and the separator (UVR or Demucs)
 
-`12k` / `12kmac` separate the vocal out of a song with Demucs.
-Demucs is **not** bundled into the app: bundling it makes a
-~330 MB file that takes 2–3 minutes to start, so the app checks
-for Demucs and tells you how to install it instead.
+`12k` / `12kmac` separate the vocal out of a song, then mix.
+You pick the engine on the app: **UVR** (default — the same
+MDX-Net models the UVR5 GUI uses, via the `audio-separator`
+package; the model picker offers Inst HQ 3, Karaoke 2,
+Inst HQ 4) or **Demucs**. Neither engine is bundled into the
+app: bundling torch makes a ~330 MB file that takes 2–3
+minutes to start, so the app checks for the chosen tool and
+tells you how to install it instead.
 
+**UVR (audio-separator):**
+- **Windows:** install Python 3.11, then in Terminal run
+  CPU torch first (otherwise pip fetches the ~2 GB CUDA torch),
+  then audio-separator:
+  ```
+  py -3.11 -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+  py -3.11 -m pip install "audio-separator[cpu]"
+  ```
+- **macOS:** install Python 3, then in Terminal run
+  ```
+  python3 -m venv ~/uvr-env
+  ~/uvr-env/bin/pip install "audio-separator[cpu]"
+  ```
+  Then make sure `audio-separator` is on PATH, e.g. add this
+  line to `~/.zprofile` and reopen Terminal:
+  ```
+  export PATH="$HOME/uvr-env/bin:$PATH"
+  ```
+
+The first 12k run downloads the chosen UVR model (~60 MB)
+once and reuses it afterwards.
+
+**Demucs:**
 - **Windows:** install Python 3.11, then in Terminal run
   `py -3.11 -m pip install demucs`
 - **macOS:** install Python 3, then in Terminal run
   `pip install demucs`
 
-After that, run the app again. Demucs + ffmpeg do the heavy
-lifting, so a song takes a few minutes depending on your machine.
+After that, run the app again. The separator + ffmpeg do the
+heavy lifting, so a song takes a few minutes depending on your
+machine.
 
 ## Building locally (optional)
 

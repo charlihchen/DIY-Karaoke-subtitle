@@ -45,9 +45,12 @@ Two modes, picked at the top of the page:
    (歌影) and the audio (伴奏) into the boxes, or click a box to
    browse. Builds the stereo karaoke file: instrumental left,
    original vocal right (左伴右唱).
-2. **12k** — video only. Separates the instrumental with Demucs
-   first, then mixes. Needs Demucs installed separately — see
-   below.
+2. **12k** — video only. Separates the instrumental first,
+   then mixes. Pick the engine on the page: **UVR** (default —
+   the same MDX-Net models the UVR5 GUI uses, via the
+   `audio-separator` package; model picker offers Inst HQ 3,
+   Karaoke 2, Inst HQ 4) or **Demucs**. Either engine is
+   installed separately — see below.
 
 Instead of uploading, you can paste a file's full path in the
 box under each drop zone. Pasted paths are read directly from
@@ -71,12 +74,30 @@ shows the real ffmpeg progress.
 - **ffmpeg** — bundled automatically via imageio-ffmpeg; no
   separate install needed. The status line on the page shows
   whether it was found.
-- **Demucs** — only for 12k mode, and still not bundled
-  (bundling it makes a ~330 MB app that takes 2–3 minutes to
-  start). Install it with `py -3.11 -m pip install demucs`
-  (Windows) or `pip install demucs` (Mac). The page shows
-  whether Demucs is ready; if it is not, 12k mode explains
-  how to install it.
+- **UVR (audio-separator)** — only for 12k mode with the UVR
+  engine, and still not bundled (torch + onnxruntime are far
+  too big to bundle). The first 12k run downloads the chosen
+  UVR model (~60 MB) once and reuses it afterwards. Install it
+  into the web app's own venv so the page finds it:
+  - Windows — install CPU torch first, otherwise pip fetches
+    the ~2 GB CUDA torch:
+    ```
+    py -3.11 -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+    py -3.11 -m pip install "audio-separator[cpu]"
+    ```
+  - Mac — from the `web/` folder (uses its `.venv`):
+    ```
+    .venv/bin/python -m pip install "audio-separator[cpu]"
+    ```
+    On Apple Silicon this needs PyTorch 2.13+ and macOS 14+.
+    The page shows whether UVR is ready; if it is not, 12k
+    mode explains how to install it.
+- **Demucs** — only for 12k mode with the Demucs engine, and
+  still not bundled (bundling it makes a ~330 MB app that
+  takes 2–3 minutes to start). Install it with
+  `py -3.11 -m pip install demucs` (Windows) or
+  `pip install demucs` (Mac). The page shows whether Demucs is
+  ready; if it is not, 12k mode explains how to install it.
 
 ## Notes
 

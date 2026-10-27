@@ -1,0 +1,19 @@
+# Optional: UVR separation for 12k mode.
+#
+# 12k's UVR engine (same MDX-Net models as the UVR5 GUI) runs
+# through the audio-separator package. Plain `pip install
+# audio-separator` does NOT work -- it misses onnxruntime, so
+# use the [cpu] extra as below. Install CPU torch FIRST on
+# Windows, otherwise pip fetches the ~2 GB CUDA torch:
+#
+#   py -3.11 -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+#   py -3.11 -m pip install -r requirements-uvr.txt
+#
+# On a Mac, install into the web folder's own venv instead
+# (from the web/ folder):
+#
+#   .venv/bin/python -m pip install -r requirements-uvr.txt
+#
+# The first 12k run downloads the chosen UVR model (~60 MB)
+# once and reuses it afterwards.
+audio-separator[cpu]

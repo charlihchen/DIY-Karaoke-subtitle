@@ -7,9 +7,10 @@ Runs on your own computer and opens in the browser
   and build a stereo karaoke file -- instrumental on the left
   channel, original (vocal) audio on the right ("左伴右唱").
 * 12k mode: pick a video only. The app separates the
-  instrumental with Demucs, then mixes. Needs Demucs installed
-  separately (``pip install demucs``) -- see the status line
-  on the page.
+  instrumental with UVR (Ultimate Vocal Remover MDX-Net models,
+  via the ``audio-separator`` package) by default, or with
+  Demucs if you pick it. Either separator is installed
+  separately -- see the status line on the page.
 
 Files can be dragged into the browser (they upload to this
 computer), or you can paste a path that already lives on this
@@ -65,6 +66,19 @@ app = FastAPI(title="DIY Karaoke")
 # job_id -> dict(status, stage, progress, message, output_path, output_name, mode, video_name)
 JOBS = {}
 JOBS_LOCK = threading.Lock()
+
+
+def _venv_bin_dirs():
+    """The web app's own .venv bin/Scripts dir, if it exists.
+
+    Installing audio-separator into the web venv is the easiest
+    Mac route (PEP 668 blocks system pip), so the app looks there
+    as well as on PATH.
+    """
+    venv = os.path.join(BASE_DIR, ".venv")
+    if os.name == "nt":
+        return [os.path.join(venv, "Scripts")]
+    return [os.path.join(venv, "bin")]
 
 
 def _new_job(mode, video_name):
@@ -160,15 +174,28 @@ def _run_mix(job_id, video_file, audio_file):
         _finish(job_id, False, message)
 
 
-def _run_12k(job_id, video_file):
+def _venv_bin_dir():
+    """The web app's own venv bin/Scripts dir, if it exists.
+
+    ``start-mac.command`` / ``start-windows.bat`` install the
+    web app's packages into ``web/.venv``; a separator installed
+    there (e.g. ``audio-separator``) is usable even when it is
+    not on PATH.
+    """
+    for path in _venv_bin_dirs():
+        if os.path.isdir(path):
+            return path
+    return None
+
+
+def _run_12k(job_id, video_file, backend="uvr", model=None):
     ffmpeg = kc.find_ffmpeg()
     if not ffmpeg:
         _finish(job_id, False, kc.ffmpeg_missing_message())
         return
-    demucs = kc.find_demucs()
-    if not demucs:
-        _finish(job_id, False, kc.demucs_missing_message())
-        return
+    model = model or kc.UVR_DEFAULT_MODEL
+    if model not in [m for m, _ in kc.UVR_MODELS]:
+        model = kc.UVR_DEFAULT_MODEL
     output_file = kc.karaoke_output_path(video_file, spaced=False)
 
     def on_stage(text):
@@ -178,8 +205,12 @@ def _run_12k(job_id, video_file):
         # Final mix is the last third of the job.
         _update(job_id, progress=0.66 + 0.34 * frac)
 
-    ok, message = kc.separate_vocals_and_mix(
-        ffmpeg, demucs, video_file, output_file,
+    search_dirs = [d for d in [_venv_bin_dir()] if d]
+    ok, message = kc.separate_and_mix(
+        ffmpeg, video_file, output_file,
+        backend=backend, model=model,
+        demucs=kc.find_demucs(),
+        audio_separator=kc.find_audio_separator(search_dirs),
         on_stage=on_stage, on_progress=on_progress,
     )
     if ok:
@@ -198,11 +229,19 @@ def index():
 def status():
     ffmpeg = kc.find_ffmpeg()
     demucs = kc.find_demucs()
+    uvr = kc.find_audio_separator([d for d in [_venv_bin_dir()] if d])
     return {
         "ffmpeg": bool(ffmpeg),
         "ffmpeg_path": ffmpeg or "",
         "demucs": bool(demucs),
         "demucs_path": demucs or "",
+        "uvr": bool(uvr),
+        "uvr_path": uvr or "",
+        "uvr_models": [
+            {"filename": fn, "label": label}
+            for fn, label in kc.UVR_MODELS
+        ],
+        "uvr_default_model": kc.UVR_DEFAULT_MODEL,
     }
 
 
@@ -236,6 +275,8 @@ def download(job_id: str):
 @app.post("/api/mix")
 def start_mix(
     mode: str = Form("mix"),
+    backend: str = Form("uvr"),
+    model: str = Form(""),
     video: UploadFile = File(None),
     audio: UploadFile = File(None),
     video_path: str = Form(""),
@@ -243,6 +284,8 @@ def start_mix(
 ):
     if mode not in ("mix", "demucs"):
         return JSONResponse({"error": "Unknown mode."}, status_code=400)
+    if backend not in ("uvr", "demucs"):
+        backend = "uvr"
     job_id = _new_job(mode, (video.filename if video else "") or os.path.basename(video_path))
     job_dir = os.path.join(WORK_DIR, job_id)
     os.makedirs(job_dir, exist_ok=True)
@@ -269,7 +312,8 @@ def start_mix(
         )
     else:
         thread = threading.Thread(
-            target=_run_12k, args=(job_id, video_file), daemon=True
+            target=_run_12k, args=(job_id, video_file, backend, model),
+            daemon=True,
         )
     thread.start()
     return {"job_id": job_id}

@@ -28,6 +28,13 @@ What it fixes over the original scripts:
   (bundling it makes a ~330 MB exe that takes 2-3 minutes to
   start -- see README), so 12k still needs a Python install
   with ``pip install demucs``.
+* 12k can also separate with UVR (Ultimate Vocal Remover) MDX-Net
+  models instead of Demucs, through the ``audio-separator``
+  package (``pip install "audio-separator[cpu]"``). UVR is the
+  engine behind the UVR5 GUI Charlih uses by hand; the same
+  models (Inst HQ 3, Karaoke 2, Inst HQ 4) run headlessly here.
+  Like Demucs, it is NOT bundled -- torch + onnxruntime are far
+  too big -- so it is installed separately and found on PATH.
 """
 
 import os
@@ -141,6 +148,75 @@ def ffmpeg_missing_message():
 def find_demucs():
     """Locate the demucs command. Returns the path, or None."""
     return shutil.which("demucs")
+
+
+# UVR (Ultimate Vocal Remover) MDX-Net models, run through the
+# `audio-separator` package. Same models the UVR5 GUI uses.
+# Inst HQ 3 is the classic instrumental model; Karaoke 2 is
+# tuned for karaoke tracks. Verified downloadable + working
+# with audio-separator 0.47.1 (2026-10-27).
+UVR_MODELS = [
+    ("UVR-MDX-NET-Inst_HQ_3.onnx", "Inst HQ 3 (default)"),
+    ("UVR_MDXNET_KARA_2.onnx", "Karaoke 2"),
+    ("UVR-MDX-NET-Inst_HQ_4.onnx", "Inst HQ 4"),
+]
+UVR_DEFAULT_MODEL = UVR_MODELS[0][0]
+
+
+def find_audio_separator(search_dirs=None):
+    """Locate the audio-separator command. Returns the path, or None.
+
+    ``search_dirs`` is checked first (the web app passes its own
+    .venv bin/Scripts dir, so installing into the web venv works
+    even when it is not on PATH).
+    """
+    exe_name = "audio-separator.exe" if os.name == "nt" else "audio-separator"
+    for directory in search_dirs or []:
+        candidate = os.path.join(directory, exe_name)
+        if os.path.isfile(candidate) and os.access(candidate, os.X_OK):
+            return candidate
+    return shutil.which("audio-separator")
+
+
+def audio_separator_missing_message():
+    if os.name == "nt":
+        return (
+            "UVR (audio-separator) was not found.\n\n"
+            "12k's UVR mode needs the audio-separator package "
+            "installed separately (torch + onnxruntime are too big "
+            "to bundle). On your PC, open a terminal and run:\n\n"
+            "    py -3.11 -m pip install torch "
+            "--index-url https://download.pytorch.org/whl/cpu\n"
+            "    py -3.11 -m pip install \"audio-separator[cpu]\"\n\n"
+            "Install CPU torch first -- plain pip would fetch the "
+            "2 GB CUDA torch instead. The first run downloads the "
+            "UVR model (~60 MB) once and reuses it afterwards."
+        )
+    if sys.platform == "darwin":
+        return (
+            "UVR (audio-separator) was not found.\n\n"
+            "12k's UVR mode needs the audio-separator package "
+            "installed separately (torch + onnxruntime are too big "
+            "to bundle). On your Mac, open Terminal and run:\n\n"
+            "    python3 -m venv ~/uvr-env\n"
+            "    ~/uvr-env/bin/pip install \"audio-separator[cpu]\"\n\n"
+            "Then make sure audio-separator is on PATH, e.g. add "
+            "this line to ~/.zprofile and reopen Terminal:\n\n"
+            "    export PATH=\"$HOME/uvr-env/bin:$PATH\"\n\n"
+            "For the web app, install it into the web folder's own "
+            "venv instead: web/.venv/bin/python -m pip install "
+            "\"audio-separator[cpu]\". The first run downloads the "
+            "UVR model (~60 MB) once and reuses it afterwards."
+        )
+    return (
+        "UVR (audio-separator) was not found.\n\n"
+        "12k's UVR mode needs the audio-separator package "
+        "installed separately. Install it with:\n\n"
+        "    pip install torch "
+        "--index-url https://download.pytorch.org/whl/cpu\n"
+        "    pip install \"audio-separator[cpu]\"\n\n"
+        "Then run this app again."
+    )
 
 
 def demucs_missing_message():
@@ -336,6 +412,113 @@ def run_ffmpeg(args, timeout=None):
         return True, "Done."
     detail = tail_lines(proc.stderr) or tail_lines(proc.stdout)
     return False, f"FFmpeg failed (exit {proc.returncode}).\n{detail}"
+
+
+def separate_vocals_uvr(ffmpeg, audio_separator, video_file, output_file,
+                         model=UVR_DEFAULT_MODEL, on_stage=None,
+                         on_progress=None):
+    """12k pipeline with UVR: extract wav -> audio-separator -> mix.
+
+    Same shape as :func:`separate_vocals_and_mix`, but the
+    instrumental comes from a UVR MDX-Net model (the same models
+    the UVR5 GUI uses) via the ``audio-separator`` command.
+    Only the instrumental stem is produced (``--single_stem
+    instrumental``); it is found by name, because audio-separator
+    names it ``<song>_(Instrumental)_<model>.wav``. The model
+    file (~60 MB) downloads once on first use and is cached by
+    audio-separator. Returns (ok, message).
+    """
+    import glob
+    import tempfile
+
+    stem = os.path.splitext(os.path.basename(video_file))[0]
+    workdir = tempfile.mkdtemp(prefix="ktv12k_uvr_")
+    try:
+        if on_stage:
+            on_stage("Extracting audio from the video...")
+        wav_file = os.path.join(workdir, f"{stem}.wav")
+        ok, message = run_ffmpeg([ffmpeg, "-y", "-i", video_file, wav_file])
+        if not ok:
+            return False, f"Could not extract audio from the video.\n{message}"
+
+        if on_stage:
+            on_stage(f"Separating instrumental with UVR ({model})... "
+                     "first run downloads the model (~60 MB).")
+        uvr_out = os.path.join(workdir, "uvr_output")
+        os.makedirs(uvr_out, exist_ok=True)
+        try:
+            proc = subprocess.run(
+                [audio_separator, wav_file,
+                 "-m", model,
+                 "--output_dir", uvr_out,
+                 "--output_format", "WAV",
+                 "--single_stem", "instrumental"],
+                capture_output=True,
+                text=True,
+                creationflags=(
+                    subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0
+                ),
+            )
+        except FileNotFoundError:
+            return False, "audio-separator executable was not found."
+        if proc.returncode != 0:
+            detail = tail_lines(proc.stderr) or tail_lines(proc.stdout)
+            return False, f"UVR separation failed (exit {proc.returncode}).\n{detail}"
+
+        matches = glob.glob(
+            os.path.join(uvr_out, "*Instrumental*.wav")
+        ) or glob.glob(
+            os.path.join(uvr_out, "**", "*Instrumental*.wav"), recursive=True
+        )
+        if not matches:
+            return False, (
+                "UVR finished but no instrumental file was found "
+                "in its output."
+            )
+        instrumental = matches[0]
+
+        if on_stage:
+            on_stage("Mixing video + instrumental...")
+        total = media_duration(ffmpeg, video_file)
+        return run_ffmpeg_progress([
+            ffmpeg,
+            "-y",
+            "-i", video_file,
+            "-i", instrumental,
+            "-map", "0:v",
+            "-filter_complex",
+            "[1:a][0:a]amerge=inputs=2,pan=stereo|c0<c0+c1|c1<c2+c3[a]",
+            "-map", "[a]",
+            "-ac", "2",
+            output_file,
+        ], total_seconds=total, on_progress=on_progress)
+    finally:
+        shutil.rmtree(workdir, ignore_errors=True)
+
+
+def separate_and_mix(ffmpeg, video_file, output_file, backend="uvr",
+                     model=UVR_DEFAULT_MODEL, demucs=None,
+                     audio_separator=None, on_stage=None, on_progress=None):
+    """12k pipeline with the chosen separator backend.
+
+    ``backend`` is "uvr" (UVR MDX-Net via audio-separator, the
+    default) or "demucs". Returns (ok, message); a missing
+    separator tool returns (False, install instructions) instead
+    of raising.
+    """
+    if backend == "demucs":
+        if not demucs:
+            return False, demucs_missing_message()
+        return separate_vocals_and_mix(
+            ffmpeg, demucs, video_file, output_file,
+            on_stage=on_stage, on_progress=on_progress,
+        )
+    if not audio_separator:
+        return False, audio_separator_missing_message()
+    return separate_vocals_uvr(
+        ffmpeg, audio_separator, video_file, output_file,
+        model=model, on_stage=on_stage, on_progress=on_progress,
+    )
 
 
 def separate_vocals_and_mix(ffmpeg, demucs, video_file, output_file,
