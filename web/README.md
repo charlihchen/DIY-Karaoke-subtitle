@@ -113,14 +113,14 @@ shows the real ffmpeg progress.
 
 ## UVR 3 tracks explaination (HQ_3 vs. KARA_2 vs. HQ_4)
 ```
-The UVR-MDX-NET-Inst_**HQ_3** model is recommended for karaoke tracks to keep the instrumental clean, 
-while the UVR_MDXNET_**KARA_2** model is designed to remove harmony and leave only the lead vocal, 
-and the UVR-MDX-NET-Inst_**HQ_4** model is noted for high-quality instrumental extraction with minimal vocal bleed.
+The UVR-MDX-NET-Inst_HQ_3 model is recommended for karaoke tracks to keep the instrumental clean, 
+while the UVR_MDXNET_KARA_2 model is designed to remove harmony and leave only the lead vocal, 
+and the UVR-MDX-NET-Inst_HQ_4 model is noted for high-quality instrumental extraction with minimal vocal bleed.
 ```
 ```
-製作卡拉 OK 伴奏軌時，建議使用 UVR-MDX-NET-Inst_**HQ_3** 模型以保持樂器音質純淨；
-UVR_MDXNET_**KARA_2** 模型則是為了移除和聲並僅保留主唱聲部而設計；
-而 UVR-MDX-NET-Inst_**HQ_4** 模型則以高品質的樂器提取及極低的人聲殘留著稱。
+製作卡拉 OK 伴奏軌時，建議使用 UVR-MDX-NET-Inst_HQ_3 模型以保持樂器音質純淨；
+UVR_MDXNET_KARA_2 模型則是為了移除和聲並僅保留主唱聲部而設計；
+而 UVR-MDX-NET-Inst_HQ_4 模型則以高品質的樂器提取及極低的人聲殘留著稱。
 ```
 
 ### Overview of UVR Models for Karaoke Tracks
@@ -128,18 +128,18 @@ UVR_MDXNET_**KARA_2** 模型則是為了移除和聲並僅保留主唱聲部而�
 When selecting a model for creating karaoke tracks using UVR, 
 it's essential to understand the differences between the available options. 
 Here’s a breakdown of the UVR models: 
-UVR-MDX-NET-Inst_**HQ_3**, 
-UVR_MDXNET_**KARA_2**, 
-and UVR-MDX-NET-Inst_**HQ_4**.
+UVR-MDX-NET-Inst_HQ_3, 
+UVR_MDXNET_KARA_2, 
+and UVR-MDX-NET-Inst_HQ_4.
 ```
 
 (製作卡拉 OK 伴奏的 UVR 模型概覽)
 ```
 使用 UVR 製作卡拉 OK 伴奏時，了解各個可用模型之間的差異至關重要。
 以下是 UVR 模型的詳細分析：
-1. UVR-MDX-NET-Inst_**HQ_3**
-2. UVR_MDXNET_**KARA_2**
-3. UVR-MDX-NET-Inst_**HQ_4**
+1. UVR-MDX-NET-Inst_HQ_3
+2. UVR_MDXNET_KARA_2
+3. UVR-MDX-NET-Inst_HQ_4
 ```
 
 ### 3 Track Model Comparison (3個模型的比較)
@@ -176,11 +176,15 @@ and UVR-MDX-NET-Inst_**HQ_4**.
 
 ### Conclusion (結論)
 Choosing the right UVR model depends on your specific needs for karaoke tracks. 
-For pure instrumental tracks, UVR-MDX-NET-Inst_**HQ_3** is recommended. 
-If you need to isolate lead vocals while removing harmonies, UVR_MDXNET_**KARA_2** is the best choice. 
-For high-quality instrumental extraction with minimal vocal interference, UVR-MDX-NET-Inst_**HQ_4** is the optimal option.
+```
+For pure instrumental tracks, UVR-MDX-NET-Inst_HQ_3 is recommended. 
+If you need to isolate lead vocals while removing harmonies, UVR_MDXNET_KARA_2 is the best choice. 
+For high-quality instrumental extraction with minimal vocal interference, UVR-MDX-NET-Inst_HQ_4 is the optimal option.
+```
 
-選擇合適的 UVR 模型取決於您對卡拉 OK 伴奏軌的具體需求。若需要純樂器軌，建議使用 UVR-MDX-NET-Inst_**HQ_3**。
-如果您需要隔離主唱並去除和聲，UVR_MDXNET_**KARA_2** 是最佳選擇。
-若要進行高品質的樂器提取並將人聲干擾降至最低，UVR-MDX-NET-Inst_**HQ_4** 則是理想之選。
-
+選擇合適的 UVR 模型取決於您對卡拉 OK 伴奏軌的具體需求。
+```
+若需要純樂器軌，建議使用 UVR-MDX-NET-Inst_HQ_3。
+如果您需要隔離主唱並去除和聲，UVR_MDXNET_KARA_2 是最佳選擇。
+若要進行高品質的樂器提取並將人聲干擾降至最低，UVR-MDX-NET-Inst_HQ_4 則是理想之選。
+```
