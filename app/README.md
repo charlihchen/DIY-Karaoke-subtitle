@@ -99,3 +99,8 @@ On macOS, drop `--onefile` to get a real `.app` bundle:
 ```
 pyinstaller --windowed --name mix2kmac --collect-all imageio_ffmpeg mix2kmac.py
 ```
+
+## 12K AKA. 1 click to(2) K檔
+
+<img width="1149" height="779" alt="image" src="https://github.com/user-attachments/assets/5f4b463a-aeb6-4a96-a3ca-165fe274e35a" />
+
