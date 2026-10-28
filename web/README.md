@@ -142,7 +142,7 @@ and UVR-MDX-NET-Inst_HQ_4.
 3. UVR-MDX-NET-Inst_HQ_4
 ```
 
-### 3 Track Model Comparison (3個模型的比較)
+### 3 Tracks Model Comparison (3個模型的比較)
 | No |Model Name 	|Purpose	|Key Features |
 |----|------------|--------|-------------|
 | 1 |UVR-MDX-NET-Inst_**HQ_3** |Karaoke track (instrumental only)	|- Keeps the instrumental clean  |
