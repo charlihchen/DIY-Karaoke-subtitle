@@ -111,7 +111,7 @@ shows the real ffmpeg progress.
 
 <img width="1530" height="988" alt="image" src="https://github.com/user-attachments/assets/3c74a696-1867-493c-9b10-06973628de4a" />
 
-## UVR 3 track explaination
+## UVR 3 tracks explaination (HQ_3 vs. KARA_2 vs. HQ4)
 
 The UVR-MDX-NET-Inst_**HQ_3** model is recommended for karaoke tracks to keep the instrumental clean, 
 while the UVR_MDXNET_**KARA_2** model is designed to remove harmony and leave only the lead vocal, 
@@ -121,10 +121,11 @@ and the UVR-MDX-NET-Inst_**HQ_4** model is noted for high-quality instrumental e
 UVR_MDXNET_**KARA_2** 模型則是為了移除和聲並僅保留主唱聲部而設計；
 而 UVR-MDX-NET-Inst_**HQ_4** 模型則以高品質的樂器提取及極低的人聲殘留著稱。
 
-### Overview of UVR Models for Karaoke Tracks (製作卡拉 OK 伴奏的 UVR 模型概覽)
+### Overview of UVR Models for Karaoke Tracks
 When selecting a model for creating karaoke tracks using UVR, it's essential to understand the differences between the available options. 
 Here’s a breakdown of the UVR models: UVR-MDX-NET-Inst_**HQ_3**, UVR_MDXNET_**KARA_2**, and UVR-MDX-NET-Inst_**HQ_4**.
 
+(製作卡拉 OK 伴奏的 UVR 模型概覽)
 使用 UVR 製作卡拉 OK 伴奏時，了解各個可用模型之間的差異至關重要。
 以下是 UVR 模型的詳細分析：
 1. UVR-MDX-NET-Inst_**HQ_3**
@@ -132,13 +133,13 @@ Here’s a breakdown of the UVR models: UVR-MDX-NET-Inst_**HQ_3**, UVR_MDXNET_**
 3. UVR-MDX-NET-Inst_**HQ_4**
 
 ### 3 Track Model Comparison (3個模型的比較)
-| No |Model Name  模型名稱	|Purpose  用途	|Key Features  主要特點 |
-|----|--------------------|--------------|----------------------|
-| 1 |UVR-MDX-NET-Inst_**HQ_3** |Karaoke track (instrumental only) 卡拉 OK 伴奏（僅純樂器）	|- Keeps the instrumental clean - 保持伴奏音軌乾淨 |
-| 2 |UVR_MDXNET_**KARA_2**	|Harmony removal (lead vocal only) 人聲和聲移除（僅保留主唱）	|- Removes harmony while retaining lead vocals - 移除和聲並保留主唱人聲 |
-| 3 |UVR-MDX-NET-Inst_**HQ_4**	|High-quality instrumental extraction 高品質伴奏提取	|- Minimal vocal bleed, high fidelity - 極少人聲殘留，高傳真度 |
+| No |Model Name 	|Purpose	|Key Features |
+|----|------------|--------|-------------|
+| 1 |UVR-MDX-NET-Inst_**HQ_3** |Karaoke track (instrumental only)	|- Keeps the instrumental clean  |
+| 2 |UVR_MDXNET_**KARA_2**	|Harmony removal (lead vocal only) 	|- Removes harmony while retaining lead vocals  |
+| 3 |UVR-MDX-NET-Inst_**HQ_4**	|High-quality instrumental extraction 	|- Minimal vocal bleed, high fidelity  |
 
-| No | 模型名稱	| 用途 | 主要特點 |
+| 排次 | 模型名稱	| 用途 | 主要特點 |
 |----|---------|------|---------|
 | 1 |UVR-MDX-NET-Inst_**HQ_3** | 卡拉 OK 伴奏（僅純樂器）	| - 保持伴奏音軌乾淨 |
 | 2 |UVR_MDXNET_**KARA_2**	| 人聲和聲移除（僅保留主唱）	|- 移除和聲並保留主唱人聲 |
