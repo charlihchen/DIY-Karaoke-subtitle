@@ -111,7 +111,7 @@ shows the real ffmpeg progress.
 
 <img width="1530" height="988" alt="image" src="https://github.com/user-attachments/assets/3c74a696-1867-493c-9b10-06973628de4a" />
 
-## UVR 3 tracks explaination (HQ_3 vs. KARA_2 vs. HQ4)
+## UVR 3 tracks explaination (HQ_3 vs. KARA_2 vs. HQ_4)
 
 The UVR-MDX-NET-Inst_**HQ_3** model is recommended for karaoke tracks to keep the instrumental clean, 
 while the UVR_MDXNET_**KARA_2** model is designed to remove harmony and leave only the lead vocal, 
