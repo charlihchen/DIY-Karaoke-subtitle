@@ -124,8 +124,14 @@ UVR_MDXNET_**KARA_2** 模型則是為了移除和聲並僅保留主唱聲部而�
 ```
 
 ### Overview of UVR Models for Karaoke Tracks
-When selecting a model for creating karaoke tracks using UVR, it's essential to understand the differences between the available options. 
-Here’s a breakdown of the UVR models: UVR-MDX-NET-Inst_**HQ_3**, UVR_MDXNET_**KARA_2**, and UVR-MDX-NET-Inst_**HQ_4**.
+```
+When selecting a model for creating karaoke tracks using UVR, 
+it's essential to understand the differences between the available options. 
+Here’s a breakdown of the UVR models: 
+UVR-MDX-NET-Inst_**HQ_3**, 
+UVR_MDXNET_**KARA_2**, 
+and UVR-MDX-NET-Inst_**HQ_4**.
+```
 
 (製作卡拉 OK 伴奏的 UVR 模型概覽)
 ```
