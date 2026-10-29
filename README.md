@@ -127,10 +127,10 @@ run them and the first-run warnings).
 | --- | --- | --- |
 | `mix2k.exe` | Windows | Video + instrumental → karaoke file |
 | `mix2k_dragdrop.exe` | Windows | Same, with drag-and-drop |
-| `12k.exe` | Windows | Video only — UVR separates the instrumental, then mixes |
+| `12k.exe` | Windows | 1 click to(2) K檔 — UVR separates the instrumental, then mixes |
 | `mix2kmac.app` | macOS | Video + instrumental → karaoke file |
 | `mix2kmac_dragdrop.app` | macOS | Same, with drag-and-drop / paste |
-| `12kmac.app` | macOS | Video only — UVR separation + mix |
+| `12kmac.app` | macOS | 1 click to(2) K檔 — UVR separation + mix |
 
 What changed in the reprogram (Oct 2026):
 
@@ -178,6 +178,7 @@ jobs, but you use it in the browser. One codebase, both systems.
 ```
 Windows: double-click web/start-windows.bat
 Mac:     double-click web/start-mac.command
+(MacOS is blocking, go to **System Settings** > **Privacy & Security**, scroll down, and click the **Open Anyway** button next to the app you want to open.)
 ```
 
 It opens at http://127.0.0.1:8001. Drag the video and the
