@@ -178,8 +178,8 @@ jobs, but you use it in the browser. One codebase, both systems.
 ```
 Windows: double-click web/start-windows.bat
 Mac:     double-click web/start-mac.command
-(MacOS is blocking, go to **System Settings** > **Privacy & Security**, scroll down, and click the **Open Anyway** button next to the app you want to open.)
 ```
+(MacOS is blocking, go to **System Settings** > **Privacy & Security**, scroll down, and click the **Open Anyway** button next to the app you want to open.)
 
 It opens at http://127.0.0.1:8001. Drag the video and the
 instrumental into the page (or paste their paths — pasted paths
